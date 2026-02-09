@@ -7,16 +7,15 @@ import {
   ScrollView,
   Image,
   Dimensions,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
-import { X, Volume2 } from 'lucide-react-native';
+import { X, Volume2, RotateCcw } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
-const CARD_SIZE = (width - 60) / 3;
+const CARD_SIZE = (width - 40) / 2;
 
 export default function CommunicationScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -114,10 +113,6 @@ export default function CommunicationScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Giao tiếp</Text>
-      </View>
-
       {sentenceStrip.length > 0 && (
         <View style={styles.sentenceStripContainer}>
           <ScrollView
@@ -130,13 +125,10 @@ export default function CommunicationScreen() {
                   source={{ uri: card.image_url }}
                   style={styles.stripCardImage}
                 />
-                <Text style={styles.stripCardText} numberOfLines={1}>
-                  {card.title}
-                </Text>
                 <TouchableOpacity
                   style={styles.removeButton}
                   onPress={() => removeFromStrip(index)}>
-                  <X size={16} color="#fff" />
+                  <X size={20} color="#fff" />
                 </TouchableOpacity>
               </View>
             ))}
@@ -145,11 +137,10 @@ export default function CommunicationScreen() {
             <TouchableOpacity
               style={styles.speakButton}
               onPress={speakSentence}>
-              <Volume2 size={24} color="#fff" />
-              <Text style={styles.speakButtonText}>Nói</Text>
+              <Volume2 size={32} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.clearButton} onPress={clearSentence}>
-              <Text style={styles.clearButtonText}>Xóa</Text>
+              <RotateCcw size={32} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
@@ -158,34 +149,28 @@ export default function CommunicationScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.categoryContainer}>
+        style={styles.categoryContainer}
+        contentContainerStyle={styles.categoryContent}>
         {categories.map((category) => (
           <TouchableOpacity
             key={category.id}
             style={[
               styles.categoryChip,
               selectedCategory === category.id && styles.categoryChipActive,
-              { borderColor: category.color },
             ]}
             onPress={() => setSelectedCategory(category.id)}>
             <Text style={styles.categoryIcon}>{category.icon}</Text>
-            <Text
-              style={[
-                styles.categoryName,
-                selectedCategory === category.id && styles.categoryNameActive,
-              ]}>
-              {category.name}
-            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      <ScrollView style={styles.cardsContainer}>
+      <ScrollView style={styles.cardsContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.cardsGrid}>
           {cards.map((card) => (
             <TouchableOpacity
               key={card.id}
               style={styles.card}
+              activeOpacity={0.7}
               onPress={() => handleCardPress(card)}>
               <Image
                 source={{ uri: card.image_url }}
@@ -208,7 +193,7 @@ export default function CommunicationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#FFF9F5',
   },
   loadingContainer: {
     flex: 1,
@@ -216,157 +201,134 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    fontSize: 18,
-    color: '#666',
-  },
-  header: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  title: {
     fontSize: 28,
     fontWeight: '700',
     color: '#1F2937',
   },
   sentenceStripContainer: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#FFF5EE',
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingHorizontal: 10,
+    borderBottomWidth: 3,
+    borderBottomColor: '#FF8C42',
   },
   sentenceStrip: {
-    paddingRight: 15,
+    paddingHorizontal: 5,
   },
   stripCard: {
-    width: 80,
-    marginRight: 10,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
+    width: 100,
+    height: 100,
+    marginHorizontal: 8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
     padding: 5,
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
   },
   stripCardImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 6,
-  },
-  stripCardText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#374151',
-    marginTop: 5,
-    textAlign: 'center',
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
   },
   removeButton: {
     position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: '#EF4444',
-    borderRadius: 12,
-    width: 24,
-    height: 24,
+    top: -8,
+    right: -8,
+    backgroundColor: '#FF6B6B',
+    borderRadius: 14,
+    width: 28,
+    height: 28,
     justifyContent: 'center',
     alignItems: 'center',
   },
   sentenceActions: {
     flexDirection: 'row',
     marginTop: 15,
-    gap: 10,
+    paddingHorizontal: 10,
+    gap: 15,
   },
   speakButton: {
     flex: 1,
-    backgroundColor: '#4A90E2',
-    borderRadius: 12,
-    padding: 15,
-    flexDirection: 'row',
+    backgroundColor: '#10B981',
+    borderRadius: 16,
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
-  },
-  speakButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
   },
   clearButton: {
-    backgroundColor: '#6B7280',
-    borderRadius: 12,
-    padding: 15,
-    paddingHorizontal: 25,
+    backgroundColor: '#FF8C42',
+    borderRadius: 16,
+    padding: 20,
     justifyContent: 'center',
-  },
-  clearButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    alignItems: 'center',
   },
   categoryContainer: {
     backgroundColor: '#fff',
-    paddingVertical: 15,
+    paddingVertical: 12,
+    maxHeight: 90,
+  },
+  categoryContent: {
     paddingHorizontal: 10,
-    maxHeight: 80,
+    gap: 10,
   },
   categoryChip: {
-    flexDirection: 'row',
+    width: 70,
+    height: 70,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    marginHorizontal: 5,
-    borderWidth: 2,
+    borderRadius: 16,
+    backgroundColor: '#F0F0F0',
+    borderWidth: 3,
     borderColor: '#E5E7EB',
   },
   categoryChipActive: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#FFF0E6',
+    borderColor: '#FF8C42',
   },
   categoryIcon: {
-    fontSize: 20,
-    marginRight: 8,
-  },
-  categoryName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
-  categoryNameActive: {
-    color: '#4A90E2',
+    fontSize: 40,
   },
   cardsContainer: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#FFF9F5',
   },
   cardsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 15,
-    gap: 15,
+    padding: 20,
+    gap: 20,
+    justifyContent: 'space-between',
   },
   card: {
     width: CARD_SIZE,
+    height: CARD_SIZE + 40,
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 5,
   },
   cardImage: {
     width: '100%',
-    height: CARD_SIZE - 50,
+    height: CARD_SIZE - 20,
     backgroundColor: '#F3F4F6',
   },
   cardTitleContainer: {
-    padding: 10,
-    minHeight: 50,
+    padding: 12,
+    height: 60,
     justifyContent: 'center',
+    backgroundColor: '#fff',
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: '#1F2937',
     textAlign: 'center',

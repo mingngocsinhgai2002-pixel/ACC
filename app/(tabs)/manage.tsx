@@ -57,14 +57,15 @@ export default function ManageScreen() {
         .order('order_index');
 
       if (error) throw error;
-      if (data) {
+      if (data && data.length > 0) {
         setCategories(data);
-        if (data.length > 0) {
-          setSelectedCategory(data[0].id);
-        }
+        setSelectedCategory(data[0].id);
+      } else {
+        setCategories([]);
       }
     } catch (error) {
       console.error('Error loading categories:', error);
+      setCategories([]);
     } finally {
       setLoading(false);
     }

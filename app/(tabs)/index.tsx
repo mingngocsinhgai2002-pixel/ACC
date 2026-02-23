@@ -42,14 +42,15 @@ export default function CommunicationScreen() {
         .order('order_index');
 
       if (error) throw error;
-      if (data) {
+      if (data && data.length > 0) {
         setCategories(data);
-        if (data.length > 0) {
-          setSelectedCategory(data[0].id);
-        }
+        setSelectedCategory(data[0].id);
+      } else {
+        setCategories([]);
       }
     } catch (error) {
       console.error('Error loading categories:', error);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -146,45 +147,57 @@ export default function CommunicationScreen() {
         </View>
       )}
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoryContainer}
-        contentContainerStyle={styles.categoryContent}>
-        {categories.map((category) => (
-          <TouchableOpacity
-            key={category.id}
-            style={[
-              styles.categoryChip,
-              selectedCategory === category.id && styles.categoryChipActive,
-            ]}
-            onPress={() => setSelectedCategory(category.id)}>
-            <Text style={styles.categoryIcon}>{category.icon}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <ScrollView style={styles.cardsContainer} showsVerticalScrollIndicator={false}>
-        <View style={styles.cardsGrid}>
-          {cards.map((card) => (
+      {categories.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryContainer}
+          contentContainerStyle={styles.categoryContent}>
+          {categories.map((category) => (
             <TouchableOpacity
-              key={card.id}
-              style={styles.card}
-              activeOpacity={0.7}
-              onPress={() => handleCardPress(card)}>
-              <Image
-                source={{ uri: card.image_url }}
-                style={styles.cardImage}
-                resizeMode="cover"
-              />
-              <View style={styles.cardTitleContainer}>
-                <Text style={styles.cardTitle} numberOfLines={2}>
-                  {card.title}
-                </Text>
-              </View>
+              key={category.id}
+              style={[
+                styles.categoryChip,
+                selectedCategory === category.id && styles.categoryChipActive,
+              ]}
+              onPress={() => setSelectedCategory(category.id)}>
+              <Text style={styles.categoryIcon}>{category.icon}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
+      )}
+
+      <ScrollView style={styles.cardsContainer} showsVerticalScrollIndicator={false}>
+        {cards.length === 0 ? (
+          <View style={styles.emptyStateContainer}>
+            <Text style={styles.emptyEmoji}>📱</Text>
+            <Text style={styles.emptyTitle}>Chưa có thẻ</Text>
+            <Text style={styles.emptySubtext}>
+              Vào "Quản lý thẻ" để thêm thẻ giao tiếp
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.cardsGrid}>
+            {cards.map((card) => (
+              <TouchableOpacity
+                key={card.id}
+                style={styles.card}
+                activeOpacity={0.7}
+                onPress={() => handleCardPress(card)}>
+                <Image
+                  source={{ uri: card.image_url }}
+                  style={styles.cardImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.cardTitleContainer}>
+                  <Text style={styles.cardTitle} numberOfLines={2}>
+                    {card.title}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -332,5 +345,27 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1F2937',
     textAlign: 'center',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 100,
+  },
+  emptyEmoji: {
+    fontSize: 60,
+    marginBottom: 15,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    paddingHorizontal: 30,
   },
 });

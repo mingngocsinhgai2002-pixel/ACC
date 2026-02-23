@@ -37,6 +37,7 @@ export default function StatisticsScreen() {
 
   async function loadStatistics() {
     try {
+      setLoading(true);
       await Promise.all([loadTopCards(), loadDailyStats(), loadTotalUsage()]);
     } catch (error) {
       console.error('Error loading statistics:', error);
@@ -54,7 +55,8 @@ export default function StatisticsScreen() {
       const { data: logs, error } = await supabase
         .from('usage_logs')
         .select('card_id')
-        .gte('used_at', startDate.toISOString());
+        .gte('used_at', startDate.toISOString())
+        .throwOnError();
 
       if (error) throw error;
 
@@ -102,7 +104,8 @@ export default function StatisticsScreen() {
       const { data: logs, error } = await supabase
         .from('usage_logs')
         .select('used_at')
-        .gte('used_at', startDate.toISOString());
+        .gte('used_at', startDate.toISOString())
+        .throwOnError();
 
       if (error) throw error;
 
@@ -126,12 +129,14 @@ export default function StatisticsScreen() {
     try {
       const { count, error } = await supabase
         .from('usage_logs')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .throwOnError();
 
       if (error) throw error;
       setTotalUsage(count || 0);
     } catch (error) {
       console.error('Error loading total usage:', error);
+      setTotalUsage(0);
     }
   }
 

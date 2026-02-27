@@ -9,17 +9,13 @@ import {
   TextInput,
   Modal,
   Alert,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
-import { Plus, Camera, Mic, Trash2, Pause, X } from 'lucide-react-native';
-
-const { width } = Dimensions.get('window');
-const CARD_SIZE = (width - 50) / 2;
+import { Plus, Camera, Mic, Trash2, Pause, Play } from 'lucide-react-native';
 
 export default function ManageScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -57,15 +53,14 @@ export default function ManageScreen() {
         .order('order_index');
 
       if (error) throw error;
-      if (data && data.length > 0) {
+      if (data) {
         setCategories(data);
-        setSelectedCategory(data[0].id);
-      } else {
-        setCategories([]);
+        if (data.length > 0) {
+          setSelectedCategory(data[0].id);
+        }
       }
     } catch (error) {
       console.error('Error loading categories:', error);
-      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -140,7 +135,7 @@ export default function ManageScreen() {
 
   async function saveCard() {
     if (!selectedCategory || !newCardTitle.trim() || !newCardImage) {
-      Alert.alert('Lỗi', 'Vui lòng nhập tên thẻ và chọn hình ảnh');
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin và chọn hình ảnh');
       return;
     }
 
@@ -171,7 +166,7 @@ export default function ManageScreen() {
   }
 
   async function deleteCard(cardId: string) {
-    Alert.alert('Xác nhận', 'Xóa thẻ này?', [
+    Alert.alert('Xác nhận', 'Bạn có chắc muốn xóa thẻ này?', [
       { text: 'Hủy', style: 'cancel' },
       {
         text: 'Xóa',
@@ -213,49 +208,63 @@ export default function ManageScreen() {
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setShowAddModal(true)}>
-          <Plus size={32} color="#fff" />
+          <Plus size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.categoryContainer}
-        contentContainerStyle={styles.categoryContent}>
+        style={styles.categoryContainer}>
         {categories.map((category) => (
           <TouchableOpacity
             key={category.id}
             style={[
               styles.categoryChip,
               selectedCategory === category.id && styles.categoryChipActive,
+              { borderColor: category.color },
             ]}
             onPress={() => setSelectedCategory(category.id)}>
             <Text style={styles.categoryIcon}>{category.icon}</Text>
+            <Text
+              style={[
+                styles.categoryName,
+                selectedCategory === category.id && styles.categoryNameActive,
+              ]}>
+              {category.name}
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      <ScrollView style={styles.cardsContainer} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.cardsContainer}>
         {cards.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>📭</Text>
-            <Text style={styles.emptyText}>Chưa có thẻ</Text>
+            <Text style={styles.emptyText}>
+              Chưa có thẻ nào trong danh mục này
+            </Text>
+            <Text style={styles.emptySubtext}>
+              Nhấn nút + để thêm thẻ mới
+            </Text>
           </View>
         ) : (
-          <View style={styles.cardsGrid}>
+          <View style={styles.cardsList}>
             {cards.map((card) => (
               <View key={card.id} style={styles.cardItem}>
                 <Image
                   source={{ uri: card.image_url }}
-                  style={styles.cardImage}
+                  style={styles.cardItemImage}
                 />
-                <Text style={styles.cardName} numberOfLines={2}>
-                  {card.title}
-                </Text>
+                <View style={styles.cardItemInfo}>
+                  <Text style={styles.cardItemTitle}>{card.title}</Text>
+                  {card.is_custom && (
+                    <Text style={styles.customBadge}>Tùy chỉnh</Text>
+                  )}
+                </View>
                 <TouchableOpacity
-                  style={styles.deleteBtn}
+                  style={styles.deleteButton}
                   onPress={() => deleteCard(card.id)}>
-                  <Trash2 size={20} color="#FF6B6B" />
+                  <Trash2 size={20} color="#EF4444" />
                 </TouchableOpacity>
               </View>
             ))}
@@ -269,25 +278,23 @@ export default function ManageScreen() {
         onRequestClose={() => setShowAddModal(false)}>
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setShowAddModal(false)}>
-              <X size={28} color="#1F2937" />
-            </TouchableOpacity>
             <Text style={styles.modalTitle}>Thêm thẻ mới</Text>
-            <View style={{ width: 28 }} />
+            <TouchableOpacity onPress={() => setShowAddModal(false)}>
+              <Text style={styles.cancelText}>Hủy</Text>
+            </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+          <ScrollView style={styles.modalContent}>
             <Text style={styles.label}>Tên thẻ</Text>
             <TextInput
               style={styles.input}
               placeholder="Ví dụ: Bình nước của bé"
-              placeholderTextColor="#9CA3AF"
               value={newCardTitle}
               onChangeText={setNewCardTitle}
             />
 
             <Text style={styles.label}>Hình ảnh</Text>
-            <View style={styles.imageContainer}>
+            <View style={styles.imagePickerContainer}>
               {newCardImage ? (
                 <Image
                   source={{ uri: newCardImage }}
@@ -295,21 +302,23 @@ export default function ManageScreen() {
                 />
               ) : (
                 <View style={styles.imagePlaceholder}>
-                  <Camera size={56} color="#9CA3AF" />
+                  <Camera size={48} color="#9CA3AF" />
+                  <Text style={styles.placeholderText}>Chưa có hình ảnh</Text>
                 </View>
               )}
             </View>
 
             <View style={styles.imageButtons}>
               <TouchableOpacity style={styles.imageButton} onPress={takePhoto}>
-                <Camera size={28} color="#fff" />
+                <Camera size={24} color="#fff" />
                 <Text style={styles.imageButtonText}>Chụp ảnh</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                <Text style={styles.imageButtonText}>Thư viện</Text>
+                <Text style={styles.imageButtonText}>Chọn từ thư viện</Text>
               </TouchableOpacity>
             </View>
 
+            <Text style={styles.label}>Ghi âm giọng nói (Tùy chọn)</Text>
             <TouchableOpacity
               style={[
                 styles.recordButton,
@@ -318,13 +327,13 @@ export default function ManageScreen() {
               onPress={isRecording ? stopRecording : startRecording}>
               {isRecording ? (
                 <>
-                  <Pause size={28} color="#fff" />
-                  <Text style={styles.recordButtonText}>Dừng ghi</Text>
+                  <Pause size={24} color="#fff" />
+                  <Text style={styles.recordButtonText}>Dừng ghi âm</Text>
                 </>
               ) : (
                 <>
-                  <Mic size={28} color="#fff" />
-                  <Text style={styles.recordButtonText}>Ghi âm</Text>
+                  <Mic size={24} color="#fff" />
+                  <Text style={styles.recordButtonText}>Bắt đầu ghi âm</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -342,7 +351,7 @@ export default function ManageScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F5',
+    backgroundColor: '#F5F7FA',
   },
   loadingContainer: {
     flex: 1,
@@ -350,9 +359,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1F2937',
+    fontSize: 18,
+    color: '#666',
   },
   header: {
     flexDirection: 'row',
@@ -369,107 +377,113 @@ const styles = StyleSheet.create({
     color: '#1F2937',
   },
   addButton: {
-    backgroundColor: '#FF8C42',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    backgroundColor: '#4A90E2',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
   categoryContainer: {
     backgroundColor: '#fff',
-    paddingVertical: 12,
-  },
-  categoryContent: {
+    paddingVertical: 15,
     paddingHorizontal: 10,
-    gap: 10,
+    maxHeight: 80,
   },
   categoryChip: {
-    width: 70,
-    height: 70,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 16,
-    backgroundColor: '#F0F0F0',
-    borderWidth: 3,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    marginHorizontal: 5,
+    borderWidth: 2,
     borderColor: '#E5E7EB',
   },
   categoryChipActive: {
-    backgroundColor: '#FFF0E6',
-    borderColor: '#FF8C42',
+    backgroundColor: '#EFF6FF',
   },
   categoryIcon: {
-    fontSize: 40,
+    fontSize: 20,
+    marginRight: 8,
+  },
+  categoryName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  categoryNameActive: {
+    color: '#4A90E2',
   },
   cardsContainer: {
     flex: 1,
-    backgroundColor: '#FFF9F5',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  emptyIcon: {
-    fontSize: 60,
-    marginBottom: 15,
+    padding: 40,
+    marginTop: 80,
   },
   emptyText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     color: '#6B7280',
+    marginBottom: 8,
   },
-  cardsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 20,
-    gap: 20,
-    justifyContent: 'space-between',
+  emptySubtext: {
+    fontSize: 14,
+    color: '#9CA3AF',
+  },
+  cardsList: {
+    padding: 15,
   },
   cardItem: {
-    width: CARD_SIZE,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 12,
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
-    position: 'relative',
-  },
-  cardImage: {
-    width: '100%',
-    height: CARD_SIZE - 40,
+    backgroundColor: '#fff',
     borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  cardItemImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
     backgroundColor: '#F3F4F6',
   },
-  cardName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginTop: 8,
-    textAlign: 'center',
+  cardItemInfo: {
+    flex: 1,
+    marginLeft: 12,
   },
-  deleteBtn: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 6,
+  cardItemTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  customBadge: {
+    fontSize: 12,
+    color: '#4A90E2',
+    marginTop: 4,
+  },
+  deleteButton: {
+    padding: 8,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#FFF9F5',
+    backgroundColor: '#fff',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
@@ -478,55 +492,60 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1F2937',
   },
+  cancelText: {
+    fontSize: 16,
+    color: '#6B7280',
+  },
   modalContent: {
     flex: 1,
-    padding: 25,
+    padding: 20,
   },
   label: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 12,
-    marginTop: 15,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 10,
+    marginTop: 20,
   },
   input: {
     backgroundColor: '#F3F4F6',
-    borderRadius: 14,
-    padding: 16,
+    borderRadius: 12,
+    padding: 15,
     fontSize: 16,
     color: '#1F2937',
-    fontWeight: '600',
   },
-  imageContainer: {
-    marginBottom: 20,
-    borderRadius: 14,
-    overflow: 'hidden',
+  imagePickerContainer: {
+    marginBottom: 15,
   },
   previewImage: {
     width: '100%',
-    height: 200,
+    height: 250,
     borderRadius: 12,
     backgroundColor: '#F3F4F6',
   },
   imagePlaceholder: {
     width: '100%',
-    height: 200,
+    height: 250,
     borderRadius: 12,
     backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  placeholderText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#9CA3AF',
+  },
   imageButtons: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 15,
+    gap: 10,
   },
   imageButton: {
     flex: 1,
-    flexDirection: 'column',
-    backgroundColor: '#0EA5E9',
-    borderRadius: 14,
-    padding: 16,
+    flexDirection: 'row',
+    backgroundColor: '#4A90E2',
+    borderRadius: 12,
+    padding: 15,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
@@ -534,37 +553,37 @@ const styles = StyleSheet.create({
   imageButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   recordButton: {
     flexDirection: 'row',
     backgroundColor: '#10B981',
-    borderRadius: 14,
-    padding: 18,
+    borderRadius: 12,
+    padding: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 15,
+    gap: 10,
   },
   recordButtonActive: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#EF4444',
   },
   recordButtonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
   },
   saveButton: {
-    backgroundColor: '#FF8C42',
-    borderRadius: 14,
-    padding: 20,
+    backgroundColor: '#4A90E2',
+    borderRadius: 12,
+    padding: 18,
+    marginTop: 30,
     marginBottom: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
   saveButtonText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
   },
 });

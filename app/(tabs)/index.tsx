@@ -7,15 +7,16 @@ import {
   ScrollView,
   Image,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
-import { X, Volume2, RotateCcw } from 'lucide-react-native';
+import { X, Volume2 } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
-const CARD_SIZE = (width - 40) / 2;
+const CARD_SIZE = (width - 60) / 3;
 
 export default function CommunicationScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -42,15 +43,14 @@ export default function CommunicationScreen() {
         .order('order_index');
 
       if (error) throw error;
-      if (data && data.length > 0) {
+      if (data) {
         setCategories(data);
-        setSelectedCategory(data[0].id);
-      } else {
-        setCategories([]);
+        if (data.length > 0) {
+          setSelectedCategory(data[0].id);
+        }
       }
     } catch (error) {
       console.error('Error loading categories:', error);
-      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -114,6 +114,10 @@ export default function CommunicationScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Giao tiếp</Text>
+      </View>
+
       {sentenceStrip.length > 0 && (
         <View style={styles.sentenceStripContainer}>
           <ScrollView
@@ -126,10 +130,13 @@ export default function CommunicationScreen() {
                   source={{ uri: card.image_url }}
                   style={styles.stripCardImage}
                 />
+                <Text style={styles.stripCardText} numberOfLines={1}>
+                  {card.title}
+                </Text>
                 <TouchableOpacity
                   style={styles.removeButton}
                   onPress={() => removeFromStrip(index)}>
-                  <X size={20} color="#fff" />
+                  <X size={16} color="#fff" />
                 </TouchableOpacity>
               </View>
             ))}
@@ -138,66 +145,61 @@ export default function CommunicationScreen() {
             <TouchableOpacity
               style={styles.speakButton}
               onPress={speakSentence}>
-              <Volume2 size={32} color="#fff" />
+              <Volume2 size={24} color="#fff" />
+              <Text style={styles.speakButtonText}>Nói</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.clearButton} onPress={clearSentence}>
-              <RotateCcw size={32} color="#fff" />
+              <Text style={styles.clearButtonText}>Xóa</Text>
             </TouchableOpacity>
           </View>
         </View>
       )}
 
-      {categories.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoryContainer}
-          contentContainerStyle={styles.categoryContent}>
-          {categories.map((category) => (
-            <TouchableOpacity
-              key={category.id}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.categoryContainer}>
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category.id}
+            style={[
+              styles.categoryChip,
+              selectedCategory === category.id && styles.categoryChipActive,
+              { borderColor: category.color },
+            ]}
+            onPress={() => setSelectedCategory(category.id)}>
+            <Text style={styles.categoryIcon}>{category.icon}</Text>
+            <Text
               style={[
-                styles.categoryChip,
-                selectedCategory === category.id && styles.categoryChipActive,
-              ]}
-              onPress={() => setSelectedCategory(category.id)}>
-              <Text style={styles.categoryIcon}>{category.icon}</Text>
+                styles.categoryName,
+                selectedCategory === category.id && styles.categoryNameActive,
+              ]}>
+              {category.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <ScrollView style={styles.cardsContainer}>
+        <View style={styles.cardsGrid}>
+          {cards.map((card) => (
+            <TouchableOpacity
+              key={card.id}
+              style={styles.card}
+              onPress={() => handleCardPress(card)}>
+              <Image
+                source={{ uri: card.image_url }}
+                style={styles.cardImage}
+                resizeMode="cover"
+              />
+              <View style={styles.cardTitleContainer}>
+                <Text style={styles.cardTitle} numberOfLines={2}>
+                  {card.title}
+                </Text>
+              </View>
             </TouchableOpacity>
           ))}
-        </ScrollView>
-      )}
-
-      <ScrollView style={styles.cardsContainer} showsVerticalScrollIndicator={false}>
-        {cards.length === 0 ? (
-          <View style={styles.emptyStateContainer}>
-            <Text style={styles.emptyEmoji}>📱</Text>
-            <Text style={styles.emptyTitle}>Chưa có thẻ</Text>
-            <Text style={styles.emptySubtext}>
-              Vào "Quản lý thẻ" để thêm thẻ giao tiếp
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.cardsGrid}>
-            {cards.map((card) => (
-              <TouchableOpacity
-                key={card.id}
-                style={styles.card}
-                activeOpacity={0.7}
-                onPress={() => handleCardPress(card)}>
-                <Image
-                  source={{ uri: card.image_url }}
-                  style={styles.cardImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.cardTitleContainer}>
-                  <Text style={styles.cardTitle} numberOfLines={2}>
-                    {card.title}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -206,7 +208,7 @@ export default function CommunicationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F5',
+    backgroundColor: '#F5F7FA',
   },
   loadingContainer: {
     flex: 1,
@@ -214,158 +216,159 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
+    fontSize: 18,
+    color: '#666',
+  },
+  header: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  title: {
     fontSize: 28,
     fontWeight: '700',
     color: '#1F2937',
   },
   sentenceStripContainer: {
-    backgroundColor: '#FFF5EE',
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingHorizontal: 10,
-    borderBottomWidth: 3,
-    borderBottomColor: '#FF8C42',
+    backgroundColor: '#fff',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
   sentenceStrip: {
-    paddingHorizontal: 5,
+    paddingRight: 15,
   },
   stripCard: {
-    width: 100,
-    height: 100,
-    marginHorizontal: 8,
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    width: 80,
+    marginRight: 10,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
     padding: 5,
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
   },
   stripCardImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
+    width: 70,
+    height: 70,
+    borderRadius: 6,
+  },
+  stripCardText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#374151',
+    marginTop: 5,
+    textAlign: 'center',
   },
   removeButton: {
     position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: '#FF6B6B',
-    borderRadius: 14,
-    width: 28,
-    height: 28,
+    top: -5,
+    right: -5,
+    backgroundColor: '#EF4444',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
   sentenceActions: {
     flexDirection: 'row',
     marginTop: 15,
-    paddingHorizontal: 10,
-    gap: 15,
+    gap: 10,
   },
   speakButton: {
     flex: 1,
-    backgroundColor: '#10B981',
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: '#4A90E2',
+    borderRadius: 12,
+    padding: 15,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 10,
+  },
+  speakButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
   },
   clearButton: {
-    backgroundColor: '#FF8C42',
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: '#6B7280',
+    borderRadius: 12,
+    padding: 15,
+    paddingHorizontal: 25,
     justifyContent: 'center',
-    alignItems: 'center',
+  },
+  clearButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   categoryContainer: {
     backgroundColor: '#fff',
-    paddingVertical: 12,
-    maxHeight: 90,
-  },
-  categoryContent: {
+    paddingVertical: 15,
     paddingHorizontal: 10,
-    gap: 10,
+    maxHeight: 80,
   },
   categoryChip: {
-    width: 70,
-    height: 70,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 16,
-    backgroundColor: '#F0F0F0',
-    borderWidth: 3,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    marginHorizontal: 5,
+    borderWidth: 2,
     borderColor: '#E5E7EB',
   },
   categoryChipActive: {
-    backgroundColor: '#FFF0E6',
-    borderColor: '#FF8C42',
+    backgroundColor: '#EFF6FF',
   },
   categoryIcon: {
-    fontSize: 40,
+    fontSize: 20,
+    marginRight: 8,
+  },
+  categoryName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  categoryNameActive: {
+    color: '#4A90E2',
   },
   cardsContainer: {
     flex: 1,
-    backgroundColor: '#FFF9F5',
+    backgroundColor: '#F5F7FA',
   },
   cardsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 20,
-    gap: 20,
-    justifyContent: 'space-between',
+    padding: 15,
+    gap: 15,
   },
   card: {
     width: CARD_SIZE,
-    height: CARD_SIZE + 40,
     backgroundColor: '#fff',
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   cardImage: {
     width: '100%',
-    height: CARD_SIZE - 20,
+    height: CARD_SIZE - 50,
     backgroundColor: '#F3F4F6',
   },
   cardTitleContainer: {
-    padding: 12,
-    height: 60,
+    padding: 10,
+    minHeight: 50,
     justifyContent: 'center',
-    backgroundColor: '#fff',
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
-    textAlign: 'center',
-  },
-  emptyStateContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 100,
-  },
-  emptyEmoji: {
-    fontSize: 60,
-    marginBottom: 15,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 8,
-  },
-  emptySubtext: {
     fontSize: 16,
-    color: '#6B7280',
+    fontWeight: '700',
+    color: '#1F2937',
     textAlign: 'center',
-    paddingHorizontal: 30,
   },
 });

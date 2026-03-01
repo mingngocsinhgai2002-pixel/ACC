@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { Card } from '@/types/database';
-import { TrendingUp, Calendar, Award } from 'lucide-react-native';
+import { TrendingUp, Award } from 'lucide-react-native';
 
 interface CardUsageStats {
   card: Card;
@@ -37,6 +37,7 @@ export default function StatisticsScreen() {
 
   async function loadStatistics() {
     try {
+      setLoading(true);
       await Promise.all([loadTopCards(), loadDailyStats(), loadTotalUsage()]);
     } catch (error) {
       console.error('Error loading statistics:', error);
@@ -54,7 +55,8 @@ export default function StatisticsScreen() {
       const { data: logs, error } = await supabase
         .from('usage_logs')
         .select('card_id')
-        .gte('used_at', startDate.toISOString());
+        .gte('used_at', startDate.toISOString())
+        .throwOnError();
 
       if (error) throw error;
 
@@ -102,7 +104,8 @@ export default function StatisticsScreen() {
       const { data: logs, error } = await supabase
         .from('usage_logs')
         .select('used_at')
-        .gte('used_at', startDate.toISOString());
+        .gte('used_at', startDate.toISOString())
+        .throwOnError();
 
       if (error) throw error;
 
@@ -126,12 +129,14 @@ export default function StatisticsScreen() {
     try {
       const { count, error } = await supabase
         .from('usage_logs')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .throwOnError();
 
       if (error) throw error;
       setTotalUsage(count || 0);
     } catch (error) {
       console.error('Error loading total usage:', error);
+      setTotalUsage(0);
     }
   }
 
@@ -144,7 +149,7 @@ export default function StatisticsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Đang tải thống kê...</Text>
+          <Text style={styles.loadingText}>Đang tải...</Text>
         </View>
       </SafeAreaView>
     );
@@ -156,22 +161,22 @@ export default function StatisticsScreen() {
         <Text style={styles.title}>Thống kê</Text>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.summaryCard}>
           <View style={styles.summaryItem}>
-            <TrendingUp size={32} color="#4A90E2" />
+            <TrendingUp size={40} color="#FF8C42" />
             <Text style={styles.summaryNumber}>{totalUsage}</Text>
-            <Text style={styles.summaryLabel}>Lượt sử dụng</Text>
+            <Text style={styles.summaryLabel}>Lần dùng</Text>
           </View>
+          <View style={styles.divider} />
           <View style={styles.summaryItem}>
-            <Award size={32} color="#10B981" />
+            <Award size={40} color="#10B981" />
             <Text style={styles.summaryNumber}>{topCards.length}</Text>
             <Text style={styles.summaryLabel}>Thẻ được dùng</Text>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Khoảng thời gian</Text>
           <View style={styles.periodButtons}>
             <TouchableOpacity
               style={[
@@ -206,21 +211,17 @@ export default function StatisticsScreen() {
 
         {dailyStats.length > 0 && (
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Calendar size={20} color="#4A90E2" />
-              <Text style={styles.sectionTitle}>Sử dụng theo ngày</Text>
-            </View>
+            <Text style={styles.sectionTitle}>Hoạt động</Text>
             <View style={styles.chartContainer}>
-              {dailyStats.map((stat, index) => {
+              {dailyStats.map((stat) => {
                 const maxCount = Math.max(...dailyStats.map((s) => s.count));
-                const height = (stat.count / maxCount) * 120;
+                const height = (stat.count / maxCount) * 100;
                 return (
                   <View key={stat.date} style={styles.chartBar}>
                     <View style={styles.barContainer}>
                       <View
-                        style={[styles.bar, { height: Math.max(height, 20) }]}>
-                        <Text style={styles.barLabel}>{stat.count}</Text>
-                      </View>
+                        style={[styles.bar, { height: Math.max(height, 15) }]}
+                      />
                     </View>
                     <Text style={styles.barDate}>{formatDate(stat.date)}</Text>
                   </View>
@@ -231,16 +232,11 @@ export default function StatisticsScreen() {
         )}
 
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <TrendingUp size={20} color="#4A90E2" />
-            <Text style={styles.sectionTitle}>Thẻ được dùng nhiều nhất</Text>
-          </View>
+          <Text style={styles.sectionTitle}>Thẻ yêu thích nhất</Text>
           {topCards.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>Chưa có dữ liệu sử dụng</Text>
-              <Text style={styles.emptySubtext}>
-                Bắt đầu sử dụng các thẻ để xem thống kê
-              </Text>
+              <Text style={styles.emptyEmoji}>😴</Text>
+              <Text style={styles.emptyText}>Chưa có dữ liệu</Text>
             </View>
           ) : (
             <View style={styles.topCardsList}>
@@ -255,9 +251,7 @@ export default function StatisticsScreen() {
                   />
                   <View style={styles.topCardInfo}>
                     <Text style={styles.topCardTitle}>{stat.card.title}</Text>
-                    <Text style={styles.topCardCount}>
-                      {stat.count} lần sử dụng
-                    </Text>
+                    <Text style={styles.topCardCount}>{stat.count} lần</Text>
                   </View>
                 </View>
               ))}
@@ -272,7 +266,7 @@ export default function StatisticsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#FFF9F5',
   },
   loadingContainer: {
     flex: 1,
@@ -280,8 +274,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    fontSize: 18,
-    color: '#666',
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1F2937',
   },
   header: {
     padding: 20,
@@ -300,71 +295,73 @@ const styles = StyleSheet.create({
   summaryCard: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    margin: 15,
-    borderRadius: 16,
-    padding: 20,
+    margin: 20,
+    borderRadius: 20,
+    paddingVertical: 25,
+    paddingHorizontal: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  divider: {
+    width: 1,
+    height: '80%',
+    backgroundColor: '#E5E7EB',
   },
   summaryItem: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   summaryNumber: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: '700',
     color: '#1F2937',
-    marginTop: 10,
+    marginTop: 12,
   },
   summaryLabel: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#6B7280',
-    marginTop: 5,
+    marginTop: 8,
+    fontWeight: '600',
   },
   section: {
     backgroundColor: '#fff',
-    marginHorizontal: 15,
-    marginBottom: 15,
-    borderRadius: 16,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-    gap: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 5,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: '#1F2937',
+    marginBottom: 15,
   },
   periodButtons: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 10,
+    gap: 12,
   },
   periodButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: 14,
+    borderRadius: 14,
     backgroundColor: '#F3F4F6',
     alignItems: 'center',
   },
   periodButtonActive: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#FF8C42',
   },
   periodButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#6B7280',
   },
   periodButtonTextActive: {
@@ -374,8 +371,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-end',
-    height: 160,
-    marginTop: 10,
+    height: 140,
+    marginTop: 15,
   },
   chartBar: {
     flex: 1,
@@ -385,81 +382,75 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     width: '100%',
-    paddingHorizontal: 2,
+    paddingHorizontal: 3,
   },
   bar: {
-    backgroundColor: '#4A90E2',
-    borderRadius: 6,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingTop: 5,
-  },
-  barLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#fff',
+    backgroundColor: '#0EA5E9',
+    borderRadius: 8,
+    width: '100%',
   },
   barDate: {
-    fontSize: 10,
+    fontSize: 12,
+    fontWeight: '600',
     color: '#6B7280',
-    marginTop: 5,
+    marginTop: 8,
   },
   emptyState: {
     alignItems: 'center',
-    padding: 30,
+    padding: 40,
+  },
+  emptyEmoji: {
+    fontSize: 56,
+    marginBottom: 12,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#6B7280',
   },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#9CA3AF',
-    marginTop: 5,
-  },
   topCardsList: {
-    gap: 12,
+    gap: 14,
   },
   topCardItem: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 16,
+    padding: 14,
   },
   rankBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#4A90E2',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FF8C42',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
   rankText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '700',
     color: '#fff',
   },
   topCardImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
+    width: 60,
+    height: 60,
+    borderRadius: 12,
     backgroundColor: '#F3F4F6',
   },
   topCardInfo: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 14,
   },
   topCardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
     color: '#1F2937',
   },
   topCardCount: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FF8C42',
+    marginTop: 4,
   },
 });

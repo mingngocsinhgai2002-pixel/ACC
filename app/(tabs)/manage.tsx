@@ -15,15 +15,22 @@ import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
-import { Plus, Camera, Mic, Trash2, Pause, Play } from 'lucide-react-native';
+import { Plus, Camera, Mic, Trash2, Pause, Play, FolderPlus } from 'lucide-react-native';
+
+const CATEGORY_ICONS = ['🍽️', '😊', '⚽', '👨‍👩‍👧', '🏠', '🧸', '🚗', '🎓', '🏥', '🎵', '📚', '��'];
+const CATEGORY_COLORS = ['#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#FFD93D', '#6BCB77', '#4D96FF', '#FF6B9D', '#C780FA', '#FFA07A'];
 
 export default function ManageScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [cards, setCards] = useState<Card[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddCardModal, setShowAddCardModal] = useState(false);
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState('');
   const [newCardImage, setNewCardImage] = useState<string | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [selectedCategoryIcon, setSelectedCategoryIcon] = useState(0);
+  const [selectedCategoryColor, setSelectedCategoryColor] = useState(0);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -155,7 +162,7 @@ export default function ManageScreen() {
       if (error) throw error;
 
       Alert.alert('Thành công', 'Đã thêm thẻ mới');
-      setShowAddModal(false);
+      setShowAddCardModal(false);
       setNewCardTitle('');
       setNewCardImage(null);
       loadCards(selectedCategory);
@@ -163,6 +170,63 @@ export default function ManageScreen() {
       console.error('Error saving card:', error);
       Alert.alert('Lỗi', 'Không thể lưu thẻ');
     }
+  }
+
+  async function saveCategory() {
+    if (!newCategoryName.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập tên danh mục');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          name: newCategoryName.trim(),
+          icon: CATEGORY_ICONS[selectedCategoryIcon],
+          color: CATEGORY_COLORS[selectedCategoryColor],
+          order_index: categories.length,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      Alert.alert('Thành công', 'Đã tạo danh mục mới');
+      setShowAddCategoryModal(false);
+      setNewCategoryName('');
+      setSelectedCategoryIcon(0);
+      setSelectedCategoryColor(0);
+      loadCategories();
+    } catch (error) {
+      console.error('Error saving category:', error);
+      Alert.alert('Lỗi', 'Không thể tạo danh mục');
+    }
+  }
+
+  async function deleteCategory(categoryId: string) {
+    Alert.alert('Xác nhận', 'Bạn có chắc muốn xóa danh mục này? Các thẻ trong danh mục sẽ bị xóa.', [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Xóa',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const { error } = await supabase
+              .from('categories')
+              .delete()
+              .eq('id', categoryId);
+
+            if (error) throw error;
+            loadCategories();
+            setSelectedCategory(null);
+          } catch (error) {
+            console.error('Error deleting category:', error);
+            Alert.alert('Lỗi', 'Không thể xóa danh mục');
+          }
+        },
+      },
+    ]);
   }
 
   async function deleteCard(cardId: string) {
@@ -205,11 +269,18 @@ export default function ManageScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Quản lý thẻ</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowAddModal(true)}>
-          <Plus size={24} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.addCategoryButton}
+            onPress={() => setShowAddCategoryModal(true)}>
+            <FolderPlus size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => setShowAddCardModal(true)}>
+            <Plus size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -224,7 +295,8 @@ export default function ManageScreen() {
               selectedCategory === category.id && styles.categoryChipActive,
               { borderColor: category.color },
             ]}
-            onPress={() => setSelectedCategory(category.id)}>
+            onPress={() => setSelectedCategory(category.id)}
+            onLongPress={() => deleteCategory(category.id)}>
             <Text style={styles.categoryIcon}>{category.icon}</Text>
             <Text
               style={[
@@ -273,13 +345,13 @@ export default function ManageScreen() {
       </ScrollView>
 
       <Modal
-        visible={showAddModal}
+        visible={showAddCardModal}
         animationType="slide"
-        onRequestClose={() => setShowAddModal(false)}>
+        onRequestClose={() => setShowAddCardModal(false)}>
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Thêm thẻ mới</Text>
-            <TouchableOpacity onPress={() => setShowAddModal(false)}>
+            <TouchableOpacity onPress={() => setShowAddCardModal(false)}>
               <Text style={styles.cancelText}>Hủy</Text>
             </TouchableOpacity>
           </View>
@@ -344,6 +416,66 @@ export default function ManageScreen() {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      <Modal
+        visible={showAddCategoryModal}
+        animationType="slide"
+        onRequestClose={() => setShowAddCategoryModal(false)}>
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Tạo danh mục mới</Text>
+            <TouchableOpacity onPress={() => setShowAddCategoryModal(false)}>
+              <Text style={styles.cancelText}>Hủy</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            <Text style={styles.label}>Tên danh mục</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ví dụ: Trái cây"
+              value={newCategoryName}
+              onChangeText={setNewCategoryName}
+            />
+
+            <Text style={styles.label}>Chọn biểu tượng</Text>
+            <View style={styles.iconGrid}>
+              {CATEGORY_ICONS.map((icon, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.iconOption,
+                    selectedCategoryIcon === index && styles.iconOptionSelected,
+                  ]}
+                  onPress={() => setSelectedCategoryIcon(index)}>
+                  <Text style={styles.iconOptionText}>{icon}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.label}>Chọn màu sắc</Text>
+            <View style={styles.colorGrid}>
+              {CATEGORY_COLORS.map((color, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.colorOption,
+                    {
+                      backgroundColor: color,
+                      borderWidth: selectedCategoryColor === index ? 3 : 0,
+                    },
+                  ]}
+                  onPress={() => setSelectedCategoryColor(index)}
+                />
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.saveButton} onPress={saveCategory}>
+              <Text style={styles.saveButtonText}>Tạo danh mục</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -371,10 +503,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
   title: {
     fontSize: 28,
     fontWeight: '700',
     color: '#1F2937',
+  },
+  addCategoryButton: {
+    backgroundColor: '#10B981',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   addButton: {
     backgroundColor: '#4A90E2',
@@ -585,5 +729,40 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '700',
+  },
+  iconGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+  iconOption: {
+    width: '23%',
+    aspectRatio: 1,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+  },
+  iconOptionSelected: {
+    borderColor: '#4A90E2',
+    backgroundColor: '#EFF6FF',
+  },
+  iconOptionText: {
+    fontSize: 32,
+  },
+  colorGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+  colorOption: {
+    width: '23%',
+    aspectRatio: 1,
+    borderRadius: 12,
+    borderColor: '#4A90E2',
   },
 });

@@ -11,15 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
-import {
-  Info,
-  Trash2,
-  HelpCircle,
-  Volume2,
-  Palette,
-  ChevronRight,
-  X,
-} from 'lucide-react-native';
+import { Info, Trash2, Circle as HelpCircle, Volume2, Palette, ChevronRight, X } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [soundEnabled, setSoundEnabled] = useState(true);

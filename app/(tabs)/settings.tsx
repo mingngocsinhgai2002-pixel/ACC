@@ -162,16 +162,6 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>Lưu ý dành cho phụ huynh</Text>
-          <Text style={styles.infoText}>
-            ✓ Sử dụng ứng dụng trong môi trường yên tĩnh{'\n'}
-            ✓ Khuyến khích bé tự chọn thẻ, không ép buộc{'\n'}
-            ✓ Khen ngợi mỗi khi bé sử dụng đúng thẻ{'\n'}
-            ✓ Bắt đầu với các thẻ quen thuộc, sau đó mở rộng dần{'\n'}
-            ✓ Kiên nhẫn và duy trì tập luyện hàng ngày
-          </Text>
-        </View>
 
         <Text style={styles.footer}>Phiên bản 1.0.0</Text>
       </ScrollView>
@@ -357,16 +347,6 @@ export default function SettingsScreen() {
               </View>
             )}
 
-            <View style={styles.guideTips}>
-              <Text style={styles.guideTipsTitle}>Mẹo hữu ích</Text>
-              <Text style={styles.guideTipsText}>
-                ✓ Sử dụng ứng dụng trong môi trường yên tĩnh{'\n\n'}
-                ✓ Khuyến khích bé tự chọn thẻ, không ép buộc{'\n\n'}
-                ✓ Khen ngợi mỗi khi bé sử dụng đúng thẻ{'\n\n'}
-                ✓ Bắt đầu với các thẻ quen thuộc, sau đó mở rộng dần{'\n\n'}
-                ✓ Kiên nhẫn và duy trì tập luyện hàng ngày
-              </Text>
-            </View>
           </ScrollView>
         </SafeAreaView>
       </Modal>

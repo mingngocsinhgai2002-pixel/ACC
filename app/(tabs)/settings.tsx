@@ -204,7 +204,12 @@ export default function SettingsScreen() {
                   <View style={styles.stepContent}>
                     <Text style={styles.stepTitle}>Chọn danh mục</Text>
                     <Text style={styles.stepText}>
-                      Chạm vào các nút danh mục ở phía trên để lựa chọn nhóm từ mà bé muốn sử dụng (Nhu cầu cơ bản, Cảm xúc, v.v.)
+                      Chạm vào các nút danh mục ở phía trên để lựa chọn nhóm từ mà bé muốn sử dụng. Các danh mục thường bao gồm:{'\n'}
+                      • Nhu cầu cơ bản (ăn, uống, ngủ, v.v.){'\n'}
+                      • Cảm xúc (vui, buồn, sợ, v.v.){'\n'}
+                      • Hoạt động (chơi, học, tập thể dục, v.v.){'\n'}
+                      • Người (mẹ, bố, em, v.v.){'\n'}
+                      Chỉ cần chạm vào tên danh mục để xem các thẻ trong đó.
                     </Text>
                   </View>
                 </View>
@@ -216,7 +221,11 @@ export default function SettingsScreen() {
                   <View style={styles.stepContent}>
                     <Text style={styles.stepTitle}>Chạm vào thẻ</Text>
                     <Text style={styles.stepText}>
-                      Chạm vào thẻ hình ảnh để thêm nó vào thanh câu. Ứng dụng sẽ tự động phát âm thanh cho bé nghe cách nói.
+                      Chạm vào thẻ hình ảnh mà bé muốn nói. Khi chạm vào:{'\n'}
+                      • Ứng dụng sẽ tự động thêm thẻ vào thanh câu ở phía dưới{'\n'}
+                      • Phát âm thanh để bé nghe cách nói từ đó{'\n'}
+                      • Ứng dụng sẽ ghi nhận lịch sử sử dụng{'\n'}
+                      Bé có thể chạm vào nhiều thẻ liên tiếp để xây dựng câu dài hơn.
                     </Text>
                   </View>
                 </View>
@@ -228,7 +237,11 @@ export default function SettingsScreen() {
                   <View style={styles.stepContent}>
                     <Text style={styles.stepTitle}>Xây dựng câu</Text>
                     <Text style={styles.stepText}>
-                      Tiếp tục chạm vào các thẻ để tạo thành câu hoàn chỉnh. Ví dụ: "Mẹ" + "ăn" + "cơm"
+                      Tiếp tục chạm vào các thẻ để tạo thành câu hoàn chỉnh. Ví dụ:{'\n'}
+                      • "Mẹ" + "ăn" + "cơm"{'\n'}
+                      • "Em" + "chơi" + "bóng"{'\n'}
+                      • "Tôi" + "muốn" + "uống" + "nước"{'\n'}
+                      Mỗi thẻ bạn chạm sẽ được hiển thị trong thanh câu phía dưới.
                     </Text>
                   </View>
                 </View>
@@ -240,7 +253,27 @@ export default function SettingsScreen() {
                   <View style={styles.stepContent}>
                     <Text style={styles.stepTitle}>Phát âm thanh</Text>
                     <Text style={styles.stepText}>
-                      Nhấn nút "Nói" để phát toàn bộ câu. Nhấn dấu X để xóa bất kỳ thẻ nào không đúng. Nhấn "Xóa" để bắt đầu lại.
+                      Khi hoàn thành câu:{'\n'}
+                      • Nhấn nút "Nói" (hình loa) để phát toàn bộ câu một lần{'\n'}
+                      • Nhấn dấu X trên từng thẻ để xóa thẻ không đúng{'\n'}
+                      • Nhấn nút "Xóa" để bắt đầu câu mới{'\n'}
+                      Ứng dụng sẽ phát từng từ theo thứ tự bé chọn.
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.guideStep}>
+                  <View style={styles.stepNumber}>
+                    <Text style={styles.stepNumberText}>5</Text>
+                  </View>
+                  <View style={styles.stepContent}>
+                    <Text style={styles.stepTitle}>Mẹo sử dụng hiệu quả</Text>
+                    <Text style={styles.stepText}>
+                      • Bắt đầu với các danh mục có thẻ quen thuộc nhất{'\n'}
+                      • Lặp lại thường xuyên để bé nhớ các thẻ{'\n'}
+                      • Phát âm chậm và rõ ràng{'\n'}
+                      • Khen ngợi bé khi sử dụng đúng thẻ{'\n'}
+                      • Sử dụng trong môi trường yên tĩnh để bé tập trung tốt hơn
                     </Text>
                   </View>
                 </View>

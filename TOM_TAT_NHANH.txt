@@ -1,0 +1,115 @@
+================================================================================
+BÁO CÁO KIỂM TRA HÌNH ẢNH THẺ AAC - TÓM TẮT NHANH
+================================================================================
+
+📊 TỔNG QUAN:
+   • Tổng số thẻ: 49
+   • ✅ Phù hợp: ~37 thẻ (75%)
+   • ❌ Không phù hợp: 8 thẻ (16%)
+   • ⚠️  URL lỗi: 2 thẻ (4%)
+
+================================================================================
+🚨 8 THẺ CẦN SỬA NGAY - THEO ĐỘ ƯU TIÊN
+================================================================================
+
+MỨC ĐỘ CAO - SỬA NGAY HÔM NAY:
+--------------------------------
+
+1. ÔNG ⚠️⚠️⚠️ (ID: 2cdceb1a...)
+   ❌ SAI HOÀN TOÀN: Hình là PHỤ NỮ TRẺ, không phải ông/đàn ông cao tuổi
+   → Cần: Hình đàn ông lớn tuổi
+
+2. MẸ ⚠️⚠️ (ID: 1f6d12ee...)
+   ❌ THIẾU CON: Chỉ có 2 người lớn xem khinh khí cầu
+   → Cần: Hình mẹ đang ôm/chăm sóc con
+
+3. BỐ ⚠️⚠️ (ID: 9dcb42f3...)
+   ❌ THIẾU CON: Chỉ có đàn ông chụp ảnh đồ ăn
+   → Cần: Hình bố đang chơi/bồng con
+
+4. SỢ ⚠️⚠️ (ID: 8ae6cc64...)
+   ❌ SAI HOÀN TOÀN: Hình cánh cửa trang trí, không phải cảm xúc
+   → Cần: Hình trẻ em/người có biểu cảm sợ hãi
+
+MỨC ĐỘ TRUNG BÌNH - SỬA TRONG TUẦN:
+------------------------------------
+
+5. ANH ⚠️ (ID: b292cce4...)
+   ❌ SAI ĐỐI TƯỢNG: Hình 3 trẻ em nhỏ, không có thanh niên nam
+   → Cần: Hình nam thanh niên/anh trai
+
+6. TẮM ⚠️ (ID: 3f989659...)
+   ❌ SAI HOẠT ĐỘNG: Hình người đàn ông làm việc
+   → Cần: Hình trẻ em tắm hoặc bồn tắm/vòi sen
+
+7. GIẬN ⚠️ (ID: b8bd710e...)
+   ❌ SAI CẢM XÚC: Hình người ngủ (thư giãn), không phải giận
+   → Cần: Hình mặt cau có/khó chịu
+
+8. BẠN ⚠️ (ID: d332d496...)
+   ❌ KHÔNG RÕ KHÁI NIỆM: Chỉ thấy tay trẻ chơi đồ chơi một mình
+   → Cần: Hình 2+ trẻ em chơi cùng nhau
+
+================================================================================
+⚠️  2 THẺ LỖI URL (Không truy cập được):
+================================================================================
+
+• CHAI NƯỚC (ID: b3e279b7...)
+• MÀN HÌNH (ID: b25ad45a...)
+→ Cần đổi từ file:// sang URL công khai (Pexels)
+
+================================================================================
+✅ CÁC THẺ PHÙ HỢP (Mẫu đã kiểm tra):
+================================================================================
+
+THẺ GIA ĐÌNH:
+• Bà ✅ - Phụ nữ lớn tuổi với cháu
+• Chị ✅ - Phụ nữ trẻ mỉm cười
+• Em ✅ - Mẹ với con nhỏ
+
+THẺ HOẠT ĐỘNG:
+• Uống nước ✅ - Ly nước đang đổ rất rõ
+• Chơi ✅ - Trẻ em chạy vui trong công viên
+• Đọc sách ✅ - Trẻ em đang đọc sách
+• Ngủ ✅ - Bé gái ở bàn ăn (buồn ngủ)
+
+THẺ CẢM XÚC:
+• Vui ✅ - Trẻ em vui vẻ
+• Buồn ✅ - Tay cầm ly (cô đơn/buồn)
+• Yêu ✅ - Gia đình đi dạo hạnh phúc
+
+================================================================================
+💡 KHUYẾN NGHỊ QUAN TRỌNG:
+================================================================================
+
+1. THẺ GIA ĐÌNH (Mẹ, Bố, Ông, Bà):
+   → BẮT BUỘC có người lớn + trẻ em trong hình
+   → Thể hiện rõ mối quan hệ gia đình
+
+2. THẺ CẢM XÚC (Vui, Buồn, Giận, Sợ):
+   → Dùng hình khuôn mặt với biểu cảm RÕ RÀNG
+   → Ưu tiên hình trẻ em để dễ đồng cảm
+
+3. THẺ HÀNH ĐỘNG:
+   → Hình phải thể hiện hành động ĐANG diễn ra
+   → Tránh hình mơ hồ
+
+================================================================================
+📁 FILE CHI TIẾT:
+================================================================================
+
+• Báo cáo đầy đủ: /tmp/cc-agent/63251158/project/bao_cao_kiem_tra_hinh_anh.md
+• Dữ liệu JSON: /tmp/cc-agent/63251158/project/ket_qua_kiem_tra.json
+• Hình ảnh đã tải: /tmp/cc-agent/63251158/project/images/
+
+================================================================================
+🎯 HÀNH ĐỘNG TIẾP THEO:
+================================================================================
+
+1. SỬA NGAY (4 thẻ ưu tiên cao): Ông, Mẹ, Bố, Sợ
+2. SỬA TRONG TUẦN (4 thẻ còn lại): Anh, Tắm, Giận, Bạn
+3. CẬP NHẬT URL (2 thẻ): Chai nước, Màn hình
+
+Đặc biệt: Các thẻ GIA ĐÌNH cực kỳ quan trọng vì trẻ dùng hàng ngày!
+
+================================================================================

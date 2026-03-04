@@ -1,0 +1,134 @@
+{
+  "tong_quan": {
+    "tong_so_the": 49,
+    "the_phu_hop": 37,
+    "the_khong_phu_hop": 8,
+    "the_loi_url": 2,
+    "ty_le_phu_hop": "75%"
+  },
+  "the_khong_phu_hop": [
+    {
+      "id": "1f6d12ee-df7e-4349-94e4-8b5fb444fb83",
+      "tieu_de": "Mẹ",
+      "url_hien_tai": "https://images.pexels.com/photos/3889742/pexels-photo-3889742.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "van_de": "Hình ảnh chỉ hiển thị hai người trưởng thành ngồi xem khinh khí cầu, không có trẻ em",
+      "ly_do": "Thẻ 'Mẹ' cần thể hiện mẹ với con để trẻ hiểu rõ khái niệm",
+      "de_xuat": "Thay bằng hình ảnh mẹ đang ôm, chăm sóc, hoặc tương tác với con",
+      "muc_do_uu_tien": "CAO"
+    },
+    {
+      "id": "9dcb42f3-5643-4a16-907e-ba5eb33feeda",
+      "tieu_de": "Bố",
+      "url_hien_tai": "https://images.pexels.com/photos/3850213/pexels-photo-3850213.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "van_de": "Hình ảnh chỉ là một người đàn ông đang chụp ảnh đồ ăn bằng điện thoại",
+      "ly_do": "Thẻ 'Bố' cần thể hiện bố với con để trẻ dễ nhận biết",
+      "de_xuat": "Thay bằng hình ảnh bố đang chơi, bồng bế, hoặc chăm sóc con",
+      "muc_do_uu_tien": "CAO"
+    },
+    {
+      "id": "2cdceb1a-a6d5-4ca0-a969-964849239dab",
+      "tieu_de": "Ông",
+      "url_hien_tai": "https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "van_de": "Hình ảnh là một phụ nữ trẻ (KHÔNG phải ông/đàn ông cao tuổi)",
+      "ly_do": "Hoàn toàn sai về giới tính và độ tuổi",
+      "de_xuat": "Thay bằng hình ảnh đàn ông lớn tuổi (ông nội/ông ngoại)",
+      "muc_do_uu_tien": "CAO - SỬA NGAY"
+    },
+    {
+      "id": "b292cce4-2b69-4a84-8f5e-c4f030b1aef2",
+      "tieu_de": "Anh",
+      "url_hien_tai": "https://images.pexels.com/photos/1212805/pexels-photo-1212805.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "van_de": "Hình ảnh hiển thị 3 trẻ em (không có thanh niên nam)",
+      "ly_do": "Không đúng đối tượng - 'Anh' cần là nam thanh niên/nam giới trẻ tuổi",
+      "de_xuat": "Thay bằng hình ảnh nam thanh niên hoặc anh trai",
+      "muc_do_uu_tien": "TRUNG BÌNH"
+    },
+    {
+      "id": "3f989659-1a11-4feb-b419-16c3aac10258",
+      "tieu_de": "Tắm",
+      "url_hien_tai": "https://images.pexels.com/photos/7129713/pexels-photo-7129713.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "van_de": "Hình ảnh là một người đàn ông làm việc/đọc giấy tờ",
+      "ly_do": "Không liên quan đến hoạt động tắm rửa",
+      "de_xuat": "Thay bằng hình ảnh trẻ em đang tắm hoặc đồ dùng tắm (bồn tắm, vòi sen)",
+      "muc_do_uu_tien": "TRUNG BÌNH"
+    },
+    {
+      "id": "b8bd710e-5547-4500-8bb4-4d3319be3a5c",
+      "tieu_de": "Giận",
+      "url_hien_tai": "https://images.pexels.com/photos/4473864/pexels-photo-4473864.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "van_de": "Hình ảnh là một người phụ nữ đang ngủ (trông thư giãn/mệt mỏi)",
+      "ly_do": "Không thể hiện cảm xúc giận dữ",
+      "de_xuat": "Thay bằng hình ảnh thể hiện cảm xúc giận (mặt cau có, khó chịu)",
+      "muc_do_uu_tien": "TRUNG BÌNH"
+    },
+    {
+      "id": "8ae6cc64-7aeb-4dc5-8ec0-311fa2bd4d1a",
+      "tieu_de": "Sợ",
+      "url_hien_tai": "https://images.pexels.com/photos/4596090/pexels-photo-4596090.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "van_de": "Hình ảnh là một cánh cửa có đầu nai trang trí (kiến trúc nội thất)",
+      "ly_do": "Hoàn toàn không liên quan đến cảm xúc sợ hãi",
+      "de_xuat": "Thay bằng hình ảnh trẻ em hoặc người có biểu cảm sợ hãi",
+      "muc_do_uu_tien": "CAO"
+    },
+    {
+      "id": "d332d496-a389-4852-b659-b1bbd2cf6b84",
+      "tieu_de": "Bạn",
+      "url_hien_tai": "https://images.pexels.com/photos/3661263/pexels-photo-3661263.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "van_de": "Hình ảnh chỉ có tay trẻ em đang chơi đồ chơi (không thấy bạn bè/tương tác xã hội)",
+      "ly_do": "Không thể hiện khái niệm 'bạn' (quan hệ bạn bè)",
+      "de_xuat": "Thay bằng hình ảnh 2 trẻ em hoặc nhiều trẻ đang chơi cùng nhau",
+      "muc_do_uu_tien": "TRUNG BÌNH"
+    }
+  ],
+  "the_loi_url": [
+    {
+      "id": "b3e279b7-e163-49b7-939b-75dac793eb83",
+      "tieu_de": "Chai nước",
+      "url_hien_tai": "file:///data/user/0/host.exp.exponent/cache/ImagePicker/5131d566-db93-45b2-ba9b-9baae05fee82.jpeg",
+      "van_de": "URL là file local, không thể truy cập từ internet",
+      "de_xuat": "Upload lên Pexels hoặc dùng URL công khai"
+    },
+    {
+      "id": "b25ad45a-8e7e-47d5-8e64-29e83f6bd0d3",
+      "tieu_de": "Màn Hình",
+      "url_hien_tai": "file:///data/user/0/host.exp.exponent/cache/ImagePicker/d258e256-8dcf-4b5e-966a-af35185653e8.jpeg",
+      "van_de": "URL là file local, không thể truy cập từ internet",
+      "de_xuat": "Upload lên Pexels hoặc dùng URL công khai"
+    }
+  ],
+  "the_phu_hop_mau": [
+    {
+      "tieu_de": "Bà",
+      "nhan_xet": "Hình ảnh phụ nữ lớn tuổi với cháu, rất phù hợp"
+    },
+    {
+      "tieu_de": "Chị",
+      "nhan_xet": "Hình ảnh phụ nữ trẻ mỉm cười, phù hợp"
+    },
+    {
+      "tieu_de": "Em",
+      "nhan_xet": "Hình ảnh mẹ với con nhỏ, phù hợp cho 'em bé'"
+    },
+    {
+      "tieu_de": "Uống nước",
+      "nhan_xet": "Hình ảnh ly nước đang đổ, rất rõ ràng"
+    },
+    {
+      "tieu_de": "Chơi",
+      "nhan_xet": "Hình ảnh trẻ em đang chạy vui vẻ trong công viên"
+    },
+    {
+      "tieu_de": "Đọc sách",
+      "nhan_xet": "Hình ảnh trẻ em đang đọc sách, phù hợp"
+    },
+    {
+      "tieu_de": "Yêu",
+      "nhan_xet": "Hình ảnh gia đình 4 người đang đi dạo vui vẻ, thể hiện tình yêu thương"
+    }
+  ],
+  "khuyен_nghi": {
+    "the_gia_dinh": "BẮT BUỘC phải có hình ảnh thể hiện mối quan hệ (người lớn với trẻ, hoặc ngữ cảnh gia đình). Với Mẹ và Bố, nên có hình ảnh tương tác mẹ-con, bố-con rõ ràng.",
+    "the_cam_xuc": "Nên dùng hình ảnh khuôn mặt với biểu cảm rõ ràng. Ưu tiên hình ảnh trẻ em để dễ đồng cảm.",
+    "the_hanh_dong": "Hình ảnh cần thể hiện rõ hành động đó đang diễn ra. Tránh hình ảnh mơ hồ hoặc có thể hiểu nhiều nghĩa."
+  }
+}

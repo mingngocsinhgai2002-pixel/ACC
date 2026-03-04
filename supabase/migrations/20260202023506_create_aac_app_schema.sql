@@ -118,38 +118,38 @@ INSERT INTO categories (name, icon, color, order_index) VALUES
   ('Đồ vật', '🧸', '#FCBAD3', 5)
 ON CONFLICT DO NOTHING;
 
--- Insert sample cards for "Nhu cầu cơ bản" category
+-- Insert sample cards for "Nhu cầu cơ bản" category (Vietnamese culturally appropriate images)
 INSERT INTO cards (category_id, title, image_url, order_index)
-SELECT 
+SELECT
   c.id,
   v.title,
   v.image_url,
   v.order_index
 FROM categories c
 CROSS JOIN (
-  VALUES 
-    ('Ăn', 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', 0),
-    ('Uống', 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg?auto=compress&cs=tinysrgb&w=400', 1),
-    ('Ngủ', 'https://images.pexels.com/photos/271897/pexels-photo-271897.jpeg?auto=compress&cs=tinysrgb&w=400', 2),
-    ('Đi vệ sinh', 'https://images.pexels.com/photos/7534555/pexels-photo-7534555.jpeg?auto=compress&cs=tinysrgb&w=400', 3)
+  VALUES
+    ('Ăn', 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg?auto=compress&cs=tinysrgb&w=400', 0),
+    ('Uống', 'https://images.pexels.com/photos/296308/pexels-photo-296308.jpeg?auto=compress&cs=tinysrgb&w=400', 1),
+    ('Ngủ', 'https://images.pexels.com/photos/1912868/pexels-photo-1912868.jpeg?auto=compress&cs=tinysrgb&w=400', 2),
+    ('Đi vệ sinh', 'https://images.pexels.com/photos/842811/pexels-photo-842811.jpeg?auto=compress&cs=tinysrgb&w=400', 3)
 ) AS v(title, image_url, order_index)
 WHERE c.name = 'Nhu cầu cơ bản'
 ON CONFLICT DO NOTHING;
 
--- Insert sample cards for "Cảm xúc" category
+-- Insert sample cards for "Cảm xúc" category (Asian children showing emotions)
 INSERT INTO cards (category_id, title, image_url, order_index)
-SELECT 
+SELECT
   c.id,
   v.title,
   v.image_url,
   v.order_index
 FROM categories c
 CROSS JOIN (
-  VALUES 
-    ('Vui', 'https://images.pexels.com/photos/3807277/pexels-photo-3807277.jpeg?auto=compress&cs=tinysrgb&w=400', 0),
-    ('Buồn', 'https://images.pexels.com/photos/3807738/pexels-photo-3807738.jpeg?auto=compress&cs=tinysrgb&w=400', 1),
-    ('Giận', 'https://images.pexels.com/photos/3807755/pexels-photo-3807755.jpeg?auto=compress&cs=tinysrgb&w=400', 2),
-    ('Sợ', 'https://images.pexels.com/photos/3601097/pexels-photo-3601097.jpeg?auto=compress&cs=tinysrgb&w=400', 3)
+  VALUES
+    ('Vui', 'https://images.pexels.com/photos/1416736/pexels-photo-1416736.jpeg?auto=compress&cs=tinysrgb&w=400', 0),
+    ('Buồn', 'https://images.pexels.com/photos/1346155/pexels-photo-1346155.jpeg?auto=compress&cs=tinysrgb&w=400', 1),
+    ('Giận', 'https://images.pexels.com/photos/4473864/pexels-photo-4473864.jpeg?auto=compress&cs=tinysrgb&w=400', 2),
+    ('Sợ', 'https://images.pexels.com/photos/4596090/pexels-photo-4596090.jpeg?auto=compress&cs=tinysrgb&w=400', 3)
 ) AS v(title, image_url, order_index)
 WHERE c.name = 'Cảm xúc'
 ON CONFLICT DO NOTHING;

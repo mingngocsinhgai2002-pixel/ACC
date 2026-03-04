@@ -261,11 +261,13 @@ export default function ManageScreen() {
                     <Text style={styles.customBadge}>Tùy chỉnh</Text>
                   )}
                 </View>
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={() => deleteCard(card.id)}>
-                  <Trash2 size={20} color="#EF4444" />
-                </TouchableOpacity>
+                {card.is_custom && (
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => deleteCard(card.id)}>
+                    <Trash2 size={20} color="#EF4444" />
+                  </TouchableOpacity>
+                )}
               </View>
             ))}
           </View>

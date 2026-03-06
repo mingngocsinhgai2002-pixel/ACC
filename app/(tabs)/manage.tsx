@@ -15,15 +15,19 @@ import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
-import { Plus, Camera, Mic, Trash2, Pause, Play } from 'lucide-react-native';
+import { Plus, Camera, Mic, Trash2, Pause, Play, CreditCard as Edit2, Link } from 'lucide-react-native';
 
 export default function ManageScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [cards, setCards] = useState<Card[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCard, setEditingCard] = useState<Card | null>(null);
   const [newCardTitle, setNewCardTitle] = useState('');
   const [newCardImage, setNewCardImage] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState('');
+  const [useUrlInput, setUseUrlInput] = useState(false);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -191,6 +195,54 @@ export default function ManageScreen() {
     ]);
   }
 
+  function openEditModal(card: Card) {
+    setEditingCard(card);
+    setNewCardTitle(card.title);
+    setNewCardImage(card.image_url);
+    setImageUrl(card.image_url);
+    setUseUrlInput(false);
+    setShowEditModal(true);
+  }
+
+  async function updateCard() {
+    if (!editingCard || !newCardTitle.trim() || !newCardImage) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('cards')
+        .update({
+          title: newCardTitle.trim(),
+          image_url: newCardImage,
+        })
+        .eq('id', editingCard.id);
+
+      if (error) throw error;
+
+      Alert.alert('Thành công', 'Đã cập nhật thẻ');
+      setShowEditModal(false);
+      setEditingCard(null);
+      setNewCardTitle('');
+      setNewCardImage(null);
+      setImageUrl('');
+      if (selectedCategory) {
+        loadCards(selectedCategory);
+      }
+    } catch (error) {
+      console.error('Error updating card:', error);
+      Alert.alert('Lỗi', 'Không thể cập nhật thẻ');
+    }
+  }
+
+  function applyImageUrl() {
+    if (imageUrl.trim()) {
+      setNewCardImage(imageUrl.trim());
+      setUseUrlInput(false);
+    }
+  }
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -261,6 +313,11 @@ export default function ManageScreen() {
                     <Text style={styles.customBadge}>Tùy chỉnh</Text>
                   )}
                 </View>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => openEditModal(card)}>
+                  <Edit2 size={20} color="#4A90E2" />
+                </TouchableOpacity>
                 {card.is_custom && (
                   <TouchableOpacity
                     style={styles.deleteButton}
@@ -320,6 +377,33 @@ export default function ManageScreen() {
               </TouchableOpacity>
             </View>
 
+            <TouchableOpacity
+              style={styles.urlButton}
+              onPress={() => setUseUrlInput(!useUrlInput)}>
+              <Link size={20} color="#4A90E2" />
+              <Text style={styles.urlButtonText}>
+                {useUrlInput ? 'Ẩn nhập URL' : 'Nhập URL hình ảnh'}
+              </Text>
+            </TouchableOpacity>
+
+            {useUrlInput && (
+              <View style={styles.urlInputContainer}>
+                <TextInput
+                  style={styles.urlInput}
+                  placeholder="https://example.com/image.jpg"
+                  value={imageUrl}
+                  onChangeText={setImageUrl}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                <TouchableOpacity
+                  style={styles.applyUrlButton}
+                  onPress={applyImageUrl}>
+                  <Text style={styles.applyUrlButtonText}>Áp dụng</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             <Text style={styles.label}>Ghi âm giọng nói (Tùy chọn)</Text>
             <TouchableOpacity
               style={[
@@ -342,6 +426,86 @@ export default function ManageScreen() {
 
             <TouchableOpacity style={styles.saveButton} onPress={saveCard}>
               <Text style={styles.saveButtonText}>Lưu thẻ</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+
+      <Modal
+        visible={showEditModal}
+        animationType="slide"
+        onRequestClose={() => setShowEditModal(false)}>
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Chỉnh sửa thẻ</Text>
+            <TouchableOpacity onPress={() => setShowEditModal(false)}>
+              <Text style={styles.cancelText}>Hủy</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            <Text style={styles.label}>Tên thẻ</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ví dụ: Bình nước của bé"
+              value={newCardTitle}
+              onChangeText={setNewCardTitle}
+            />
+
+            <Text style={styles.label}>Hình ảnh</Text>
+            <View style={styles.imagePickerContainer}>
+              {newCardImage ? (
+                <Image
+                  source={{ uri: newCardImage }}
+                  style={styles.previewImage}
+                />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <Camera size={48} color="#9CA3AF" />
+                  <Text style={styles.placeholderText}>Chưa có hình ảnh</Text>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.imageButtons}>
+              <TouchableOpacity style={styles.imageButton} onPress={takePhoto}>
+                <Camera size={24} color="#fff" />
+                <Text style={styles.imageButtonText}>Chụp ảnh</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                <Text style={styles.imageButtonText}>Chọn từ thư viện</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.urlButton}
+              onPress={() => setUseUrlInput(!useUrlInput)}>
+              <Link size={20} color="#4A90E2" />
+              <Text style={styles.urlButtonText}>
+                {useUrlInput ? 'Ẩn nhập URL' : 'Nhập URL hình ảnh'}
+              </Text>
+            </TouchableOpacity>
+
+            {useUrlInput && (
+              <View style={styles.urlInputContainer}>
+                <TextInput
+                  style={styles.urlInput}
+                  placeholder="https://example.com/image.jpg"
+                  value={imageUrl}
+                  onChangeText={setImageUrl}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                <TouchableOpacity
+                  style={styles.applyUrlButton}
+                  onPress={applyImageUrl}>
+                  <Text style={styles.applyUrlButtonText}>Áp dụng</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <TouchableOpacity style={styles.saveButton} onPress={updateCard}>
+              <Text style={styles.saveButtonText}>Cập nhật thẻ</Text>
             </TouchableOpacity>
           </ScrollView>
         </SafeAreaView>
@@ -474,8 +638,52 @@ const styles = StyleSheet.create({
     color: '#4A90E2',
     marginTop: 4,
   },
+  editButton: {
+    padding: 8,
+  },
   deleteButton: {
     padding: 8,
+  },
+  urlButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 15,
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#4A90E2',
+    backgroundColor: '#F0F9FF',
+  },
+  urlButtonText: {
+    color: '#4A90E2',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  urlInputContainer: {
+    marginTop: 15,
+    gap: 10,
+  },
+  urlInput: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    padding: 15,
+    fontSize: 16,
+    color: '#1F2937',
+    borderWidth: 1,
+    borderColor: '#4A90E2',
+  },
+  applyUrlButton: {
+    backgroundColor: '#4A90E2',
+    borderRadius: 12,
+    padding: 15,
+    alignItems: 'center',
+  },
+  applyUrlButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   modalContainer: {
     flex: 1,

@@ -15,7 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
-import { Plus, Camera, Mic, Trash2, Pause, Play, CreditCard as Edit2, Link } from 'lucide-react-native';
+import { Plus, Camera, Mic, Trash2, Pause, CreditCard as Edit2, Link } from 'lucide-react-native';
 
 export default function ManageScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -146,7 +146,7 @@ export default function ManageScreen() {
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('cards')
         .insert({
           category_id: selectedCategory,

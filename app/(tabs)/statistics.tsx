@@ -38,23 +38,22 @@ export default function StatisticsScreen() {
   );
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [dayDetails, setDayDetails] = useState<DayDetail | null>(null);
   const [showDayModal, setShowDayModal] = useState(false);
 
   useEffect(() => {
-    loadStatistics();
+    const loadStats = async () => {
+      try {
+        await Promise.all([loadTopCards(), loadDailyStats(), loadTotalUsage()]);
+      } catch (error) {
+        console.error('Error loading statistics:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStats();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPeriod]);
-
-  async function loadStatistics() {
-    try {
-      await Promise.all([loadTopCards(), loadDailyStats(), loadTotalUsage()]);
-    } catch (error) {
-      console.error('Error loading statistics:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function loadTopCards() {
     try {
@@ -144,11 +143,6 @@ export default function StatisticsScreen() {
     } catch (error) {
       console.error('Error loading total usage:', error);
     }
-  }
-
-  function formatDate(dateString: string) {
-    const date = new Date(dateString);
-    return `${date.getDate()}/${date.getMonth() + 1}`;
   }
 
   async function loadDayDetails(dateString: string) {

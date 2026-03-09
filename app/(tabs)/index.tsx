@@ -71,6 +71,31 @@ export default function CommunicationScreen() {
     }
   }
 
+  function getImageSource(imageUrl: string) {
+    const imageMap: Record<string, any> = {
+      'anh.jpg': require('@/images/anh.jpg'),
+      'ba.jpg': require('@/images/ba.jpg'),
+      'ban.jpg': require('@/images/ban.jpg'),
+      'bo.jpg': require('@/images/bo.jpg'),
+      'buon.jpg': require('@/images/buon.jpg'),
+      'chi.jpg': require('@/images/chi.jpg'),
+      'choi.jpg': require('@/images/choi.jpg'),
+      'doc_sach.jpg': require('@/images/doc_sach.jpg'),
+      'em.jpg': require('@/images/em.jpg'),
+      'gian.jpg': require('@/images/gian.jpg'),
+      'me.jpg': require('@/images/me.jpg'),
+      'ngu.jpg': require('@/images/ngu.jpg'),
+      'ong.jpg': require('@/images/ong.jpg'),
+      'so.jpg': require('@/images/so.jpg'),
+      'tam.jpg': require('@/images/tam.jpg'),
+      'uong_nuoc.jpg': require('@/images/uong_nuoc.jpg'),
+      'vui.jpg': require('@/images/vui.jpg'),
+      'yeu.jpg': require('@/images/yeu.jpg'),
+    };
+
+    return imageMap[imageUrl] || { uri: imageUrl };
+  }
+
   async function handleCardPress(card: Card) {
     setSentenceStrip([...sentenceStrip, card]);
     await Speech.speak(card.title, { language: 'vi-VN' });
@@ -127,7 +152,7 @@ export default function CommunicationScreen() {
             {sentenceStrip.map((card, index) => (
               <View key={`${card.id}-${index}`} style={styles.stripCard}>
                 <Image
-                  source={{ uri: card.image_url }}
+                  source={getImageSource(card.image_url)}
                   style={styles.stripCardImage}
                 />
                 <Text style={styles.stripCardText} numberOfLines={1}>
@@ -188,7 +213,7 @@ export default function CommunicationScreen() {
               style={styles.card}
               onPress={() => handleCardPress(card)}>
               <Image
-                source={{ uri: card.image_url }}
+                source={getImageSource(card.image_url)}
                 style={styles.cardImage}
                 resizeMode="cover"
               />

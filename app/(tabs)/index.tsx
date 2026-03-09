@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
-import { X, Volume2, Lock, Unlock } from 'lucide-react-native';
+import { X, Volume2, Lock, Clock as Unlock } from 'lucide-react-native';
 import { useParentMode } from '@/contexts/ParentModeContext';
 
 const { width } = Dimensions.get('window');

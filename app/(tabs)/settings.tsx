@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
-import { Info, Trash2, Volume2, Palette, ChevronRight, Lock, Unlock } from 'lucide-react-native';
+import { Info, Trash2, Volume2, Palette, ChevronRight, Lock, Clock as Unlock } from 'lucide-react-native';
 import { useParentMode } from '@/contexts/ParentModeContext';
 
 export default function SettingsScreen() {

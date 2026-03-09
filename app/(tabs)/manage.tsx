@@ -12,10 +12,20 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import { Audio } from 'expo-av';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
 import { Plus, Camera, Mic, Trash2, Pause, Play, CreditCard as Edit2, Link } from 'lucide-react-native';
+
+function decode(base64: string): ArrayBuffer {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
 
 export default function ManageScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -139,6 +149,41 @@ export default function ManageScreen() {
     setRecording(null);
   }
 
+  async function uploadAudioToStorage(audioUri: string): Promise<string | null> {
+    try {
+      const fileExt = 'mp3';
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `audio/${fileName}`;
+
+      const fileInfo = await FileSystem.getInfoAsync(audioUri);
+      if (!fileInfo.exists) {
+        throw new Error('File không tồn tại');
+      }
+
+      const base64 = await FileSystem.readAsStringAsync(audioUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const { data, error } = await supabase.storage
+        .from('aac-media')
+        .upload(filePath, decode(base64), {
+          contentType: 'audio/mpeg',
+        });
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('aac-media')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+      Alert.alert('Lỗi', 'Không thể upload file ghi âm');
+      return null;
+    }
+  }
+
   async function saveCard() {
     if (!selectedCategory || !newCardTitle.trim() || !newCardImage) {
       Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin và chọn hình ảnh');
@@ -146,13 +191,19 @@ export default function ManageScreen() {
     }
 
     try {
+      let audioUrl = null;
+      if (recordedAudioUri) {
+        audioUrl = await uploadAudioToStorage(recordedAudioUri);
+        if (!audioUrl) return;
+      }
+
       const { data, error } = await supabase
         .from('cards')
         .insert({
           category_id: selectedCategory,
           title: newCardTitle.trim(),
           image_url: newCardImage,
-          audio_url: recordedAudioUri,
+          audio_url: audioUrl,
           is_custom: true,
           order_index: cards.length,
         })
@@ -216,12 +267,20 @@ export default function ManageScreen() {
     }
 
     try {
+      let audioUrl = editingCard.audio_url;
+
+      if (recordedAudioUri && recordedAudioUri !== editingCard.audio_url) {
+        const uploadedUrl = await uploadAudioToStorage(recordedAudioUri);
+        if (!uploadedUrl) return;
+        audioUrl = uploadedUrl;
+      }
+
       const { error } = await supabase
         .from('cards')
         .update({
           title: newCardTitle.trim(),
           image_url: newCardImage,
-          audio_url: recordedAudioUri,
+          audio_url: audioUrl,
         })
         .eq('id', editingCard.id);
 

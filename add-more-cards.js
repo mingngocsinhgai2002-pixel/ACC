@@ -27,44 +27,42 @@ async function addCards() {
   });
 
   const newCards = [
-    // Nhu cầu cơ bản (thêm vào)
-    { category: 'Nhu cầu cơ bản', title: 'Tắm', image_url: 'tam.jpg', order_index: 10 },
-    { category: 'Nhu cầu cơ bản', title: 'Chơi', image_url: 'choi.jpg', order_index: 11 },
-    { category: 'Nhu cầu cơ bản', title: 'Đọc sách', image_url: 'doc_sach.jpg', order_index: 12 },
+    // Nhu cầu cơ bản (thêm)
+    { category: 'Nhu cầu cơ bản', title: 'Đói', image_url: 'doi.jpg', order_index: 13 },
+    { category: 'Nhu cầu cơ bản', title: 'Khát', image_url: 'khat.jpg', order_index: 14 },
+    { category: 'Nhu cầu cơ bản', title: 'Mệt', image_url: 'met.jpg', order_index: 15 },
+    { category: 'Nhu cầu cơ bản', title: 'Đau', image_url: 'dau.jpg', order_index: 16 },
 
-    // Cảm xúc (thêm vào)
-    { category: 'Cảm xúc', title: 'Yêu', image_url: 'yeu.jpg', order_index: 10 },
+    // Cảm xúc (thêm)
+    { category: 'Cảm xúc', title: 'Ngạc nhiên', image_url: 'ngac_nhien.jpg', order_index: 11 },
+    { category: 'Cảm xúc', title: 'Hạnh phúc', image_url: 'hanh_phuc.jpg', order_index: 12 },
+    { category: 'Cảm xúc', title: 'Thích', image_url: 'thich.jpg', order_index: 13 },
+    { category: 'Cảm xúc', title: 'Không thích', image_url: 'khong_thich.jpg', order_index: 14 },
 
-    // Hoạt động (nhiều hơn)
-    { category: 'Hoạt động', title: 'Chơi', image_url: 'choi.jpg', order_index: 0 },
-    { category: 'Hoạt động', title: 'Đọc sách', image_url: 'doc_sach.jpg', order_index: 1 },
-    { category: 'Hoạt động', title: 'Tắm', image_url: 'tam.jpg', order_index: 2 },
-    { category: 'Hoạt động', title: 'Ngủ', image_url: 'ngu.jpg', order_index: 3 },
-    { category: 'Hoạt động', title: 'Ăn', image_url: 'an.jpg', order_index: 4 },
-    { category: 'Hoạt động', title: 'Uống nước', image_url: 'uong_nuoc.jpg', order_index: 5 },
-    { category: 'Hoạt động', title: 'Chơi với bạn', image_url: 'ban.jpg', order_index: 6 },
+    // Hoạt động (thêm)
+    { category: 'Hoạt động', title: 'Viết', image_url: 'viet.jpg', order_index: 7 },
+    { category: 'Hoạt động', title: 'Vẽ', image_url: 've.jpg', order_index: 8 },
+    { category: 'Hoạt động', title: 'Hát', image_url: 'hat.jpg', order_index: 9 },
+    { category: 'Hoạt động', title: 'Nhảy', image_url: 'nhay.jpg', order_index: 10 },
+    { category: 'Hoạt động', title: 'Xem tivi', image_url: 'xem_tivi.jpg', order_index: 11 },
+    { category: 'Hoạt động', title: 'Nghe nhạc', image_url: 'nghe_nhac.jpg', order_index: 12 },
 
-    // Người thân (đầy đủ)
-    { category: 'Người thân', title: 'Mẹ', image_url: 'me.jpg', order_index: 0 },
-    { category: 'Người thân', title: 'Ba', image_url: 'ba.jpg', order_index: 1 },
-    { category: 'Người thân', title: 'Anh', image_url: 'anh.jpg', order_index: 2 },
-    { category: 'Người thân', title: 'Chị', image_url: 'chi.jpg', order_index: 3 },
-    { category: 'Người thân', title: 'Em', image_url: 'em.jpg', order_index: 4 },
-    { category: 'Người thân', title: 'Ông', image_url: 'ong.jpg', order_index: 5 },
-    { category: 'Người thân', title: 'Bà', image_url: 'ba.jpg', order_index: 6 },
-    { category: 'Người thân', title: 'Bạn', image_url: 'ban.jpg', order_index: 7 },
+    // Người thân (thêm)
+    { category: 'Người thân', title: 'Cô giáo', image_url: 'co_giao.jpg', order_index: 8 },
+    { category: 'Người thân', title: 'Bác sĩ', image_url: 'bac_si.jpg', order_index: 9 },
 
-    // Địa điểm
-    { category: 'Địa điểm', title: 'Nhà', image_url: 'nha.jpg', order_index: 0 },
-    { category: 'Địa điểm', title: 'Trường', image_url: 'truong.jpg', order_index: 1 },
-    { category: 'Địa điểm', title: 'Công viên', image_url: 'cong_vien.jpg', order_index: 2 },
-    { category: 'Địa điểm', title: 'Bệnh viện', image_url: 'benh_vien.jpg', order_index: 3 },
+    // Địa điểm (thêm)
+    { category: 'Địa điểm', title: 'Siêu thị', image_url: 'sieu_thi.jpg', order_index: 4 },
+    { category: 'Địa điểm', title: 'Nhà hàng', image_url: 'nha_hang.jpg', order_index: 5 },
+    { category: 'Địa điểm', title: 'Nhà bà ngoại', image_url: 'nha_ba_ngoai.jpg', order_index: 6 },
 
-    // Đồ vật
-    { category: 'Đồ vật', title: 'Bóng', image_url: 'bo.jpg', order_index: 0 },
-    { category: 'Đồ vật', title: 'Sách', image_url: 'sach.jpg', order_index: 1 },
-    { category: 'Đồ vật', title: 'Bút', image_url: 'but.jpg', order_index: 2 },
-    { category: 'Đồ vật', title: 'Điện thoại', image_url: 'dien_thoai.jpg', order_index: 3 },
+    // Đồ vật (thêm)
+    { category: 'Đồ vật', title: 'Xe đạp', image_url: 'xe_dap.jpg', order_index: 4 },
+    { category: 'Đồ vật', title: 'Ô tô', image_url: 'o_to.jpg', order_index: 5 },
+    { category: 'Đồ vật', title: 'Máy tính', image_url: 'may_tinh.jpg', order_index: 6 },
+    { category: 'Đồ vật', title: 'Tivi', image_url: 'tivi.jpg', order_index: 7 },
+    { category: 'Đồ vật', title: 'Túi', image_url: 'tui.jpg', order_index: 8 },
+    { category: 'Đồ vật', title: 'Áo', image_url: 'ao.jpg', order_index: 9 },
   ];
 
   const cardsToInsert = newCards.map(card => ({

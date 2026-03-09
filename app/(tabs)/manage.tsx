@@ -30,6 +30,7 @@ export default function ManageScreen() {
   const [useUrlInput, setUseUrlInput] = useState(false);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [recordedAudioUri, setRecordedAudioUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -134,6 +135,7 @@ export default function ManageScreen() {
     setIsRecording(false);
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
+    setRecordedAudioUri(uri);
     setRecording(null);
   }
 
@@ -150,6 +152,7 @@ export default function ManageScreen() {
           category_id: selectedCategory,
           title: newCardTitle.trim(),
           image_url: newCardImage,
+          audio_url: recordedAudioUri,
           is_custom: true,
           order_index: cards.length,
         })
@@ -162,6 +165,7 @@ export default function ManageScreen() {
       setShowAddModal(false);
       setNewCardTitle('');
       setNewCardImage(null);
+      setRecordedAudioUri(null);
       loadCards(selectedCategory);
     } catch (error) {
       console.error('Error saving card:', error);
@@ -200,6 +204,7 @@ export default function ManageScreen() {
     setNewCardTitle(card.title);
     setNewCardImage(card.image_url);
     setImageUrl(card.image_url);
+    setRecordedAudioUri(card.audio_url || null);
     setUseUrlInput(false);
     setShowEditModal(true);
   }
@@ -216,6 +221,7 @@ export default function ManageScreen() {
         .update({
           title: newCardTitle.trim(),
           image_url: newCardImage,
+          audio_url: recordedAudioUri,
         })
         .eq('id', editingCard.id);
 
@@ -226,6 +232,7 @@ export default function ManageScreen() {
       setEditingCard(null);
       setNewCardTitle('');
       setNewCardImage(null);
+      setRecordedAudioUri(null);
       setImageUrl('');
       if (selectedCategory) {
         loadCards(selectedCategory);
@@ -405,12 +412,23 @@ export default function ManageScreen() {
             )}
 
             <Text style={styles.label}>Ghi âm giọng nói (Tùy chọn)</Text>
+            {recordedAudioUri && !isRecording && (
+              <View style={styles.audioStatus}>
+                <Text style={styles.audioStatusText}>✓ Đã ghi âm xong</Text>
+                <TouchableOpacity
+                  style={styles.reRecordButton}
+                  onPress={() => setRecordedAudioUri(null)}>
+                  <Text style={styles.reRecordButtonText}>Ghi lại</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             <TouchableOpacity
               style={[
                 styles.recordButton,
                 isRecording && styles.recordButtonActive,
               ]}
-              onPress={isRecording ? stopRecording : startRecording}>
+              onPress={isRecording ? stopRecording : startRecording}
+              disabled={recordedAudioUri !== null && !isRecording}>
               {isRecording ? (
                 <>
                   <Pause size={24} color="#fff" />
@@ -419,7 +437,9 @@ export default function ManageScreen() {
               ) : (
                 <>
                   <Mic size={24} color="#fff" />
-                  <Text style={styles.recordButtonText}>Bắt đầu ghi âm</Text>
+                  <Text style={styles.recordButtonText}>
+                    {recordedAudioUri ? 'Đã ghi âm' : 'Bắt đầu ghi âm'}
+                  </Text>
                 </>
               )}
             </TouchableOpacity>
@@ -503,6 +523,39 @@ export default function ManageScreen() {
                 </TouchableOpacity>
               </View>
             )}
+
+            <Text style={styles.label}>Ghi âm giọng nói (Tùy chọn)</Text>
+            {recordedAudioUri && !isRecording && (
+              <View style={styles.audioStatus}>
+                <Text style={styles.audioStatusText}>✓ Đã có ghi âm</Text>
+                <TouchableOpacity
+                  style={styles.reRecordButton}
+                  onPress={() => setRecordedAudioUri(null)}>
+                  <Text style={styles.reRecordButtonText}>Ghi lại</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <TouchableOpacity
+              style={[
+                styles.recordButton,
+                isRecording && styles.recordButtonActive,
+              ]}
+              onPress={isRecording ? stopRecording : startRecording}
+              disabled={recordedAudioUri !== null && !isRecording}>
+              {isRecording ? (
+                <>
+                  <Pause size={24} color="#fff" />
+                  <Text style={styles.recordButtonText}>Dừng ghi âm</Text>
+                </>
+              ) : (
+                <>
+                  <Mic size={24} color="#fff" />
+                  <Text style={styles.recordButtonText}>
+                    {recordedAudioUri ? 'Đã ghi âm' : 'Bắt đầu ghi âm'}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.saveButton} onPress={updateCard}>
               <Text style={styles.saveButtonText}>Cập nhật thẻ</Text>
@@ -780,6 +833,35 @@ const styles = StyleSheet.create({
   recordButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  audioStatus: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#D1FAE5',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  audioStatusText: {
+    color: '#047857',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  reRecordButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  reRecordButtonText: {
+    color: '#047857',
+    fontSize: 14,
     fontWeight: '600',
   },
   saveButton: {

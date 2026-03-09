@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { MessageSquare, Grid2x2 as Grid, ChartBar as BarChart3, Settings } from 'lucide-react-native';
+import { MessageSquare, Grid2x2 as Grid, BarChart2, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -41,7 +41,7 @@ export default function TabLayout() {
         options={{
           title: 'Thống kê',
           tabBarIcon: ({ size, color }) => (
-            <BarChart3 size={size} color={color} />
+            <BarChart2 size={size} color={color} />
           ),
         }}
       />

@@ -93,7 +93,11 @@ export default function CommunicationScreen() {
       'yeu.jpg': require('@/images/yeu.jpg'),
     };
 
-    return imageMap[imageUrl] || { uri: imageUrl };
+    if (imageMap[imageUrl]) {
+      return imageMap[imageUrl];
+    }
+
+    return null;
   }
 
   async function handleCardPress(card: Card) {
@@ -151,10 +155,16 @@ export default function CommunicationScreen() {
             contentContainerStyle={styles.sentenceStrip}>
             {sentenceStrip.map((card, index) => (
               <View key={`${card.id}-${index}`} style={styles.stripCard}>
-                <Image
-                  source={getImageSource(card.image_url)}
-                  style={styles.stripCardImage}
-                />
+                {getImageSource(card.image_url) ? (
+                  <Image
+                    source={getImageSource(card.image_url)}
+                    style={styles.stripCardImage}
+                  />
+                ) : (
+                  <View style={[styles.stripCardImage, styles.placeholderImage]}>
+                    <Text style={styles.placeholderTextSmall}>?</Text>
+                  </View>
+                )}
                 <Text style={styles.stripCardText} numberOfLines={1}>
                   {card.title}
                 </Text>
@@ -212,11 +222,17 @@ export default function CommunicationScreen() {
               key={card.id}
               style={styles.card}
               onPress={() => handleCardPress(card)}>
-              <Image
-                source={getImageSource(card.image_url)}
-                style={styles.cardImage}
-                resizeMode="cover"
-              />
+              {getImageSource(card.image_url) ? (
+                <Image
+                  source={getImageSource(card.image_url)}
+                  style={styles.cardImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={[styles.cardImage, styles.placeholderImage]}>
+                  <Text style={styles.placeholderText}>?</Text>
+                </View>
+              )}
               <View style={styles.cardTitleContainer}>
                 <Text style={styles.cardTitle} numberOfLines={2}>
                   {card.title}
@@ -395,5 +411,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1F2937',
     textAlign: 'center',
+  },
+  placeholderImage: {
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    fontSize: 48,
+    color: '#9CA3AF',
+    fontWeight: '300',
+  },
+  placeholderTextSmall: {
+    fontSize: 32,
+    color: '#9CA3AF',
+    fontWeight: '300',
   },
 });

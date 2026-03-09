@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,12 @@ import {
   ScrollView,
   Image,
   Dimensions,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
 import { supabase } from '@/lib/supabase';
 import { Category, Card } from '@/types/database';
-import { X, Volume2, Lock, Clock as Unlock } from 'lucide-react-native';
-import { useParentMode } from '@/contexts/ParentModeContext';
+import { X, Volume2 } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const CARD_SIZE = (width - 60) / 3;
@@ -25,9 +23,6 @@ export default function CommunicationScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sentenceStrip, setSentenceStrip] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showModeButton, setShowModeButton] = useState(false);
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
-  const { isParentMode, toggleMode } = useParentMode();
 
   useEffect(() => {
     loadCategories();
@@ -217,29 +212,6 @@ export default function CommunicationScreen() {
     setSentenceStrip([]);
   }
 
-  function handleLongPressStart() {
-    longPressTimer.current = setTimeout(() => {
-      setShowModeButton(true);
-    }, 3000);
-  }
-
-  function handleLongPressEnd() {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }
-
-  function handleToggleMode() {
-    toggleMode();
-    setShowModeButton(false);
-    Alert.alert(
-      'Đã chuyển chế độ',
-      isParentMode ? 'Đã chuyển sang chế độ trẻ em' : 'Đã chuyển sang chế độ phụ huynh',
-      [{ text: 'OK' }]
-    );
-  }
-
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -253,25 +225,7 @@ export default function CommunicationScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.hiddenButton}
-          onPressIn={handleLongPressStart}
-          onPressOut={handleLongPressEnd}
-          activeOpacity={1}>
-          <View style={styles.hiddenButtonArea} />
-        </TouchableOpacity>
         <Text style={styles.title}>Giao tiếp</Text>
-        {showModeButton && (
-          <TouchableOpacity
-            style={styles.modeButton}
-            onPress={handleToggleMode}>
-            {isParentMode ? (
-              <Unlock size={24} color="#fff" />
-            ) : (
-              <Lock size={24} color="#fff" />
-            )}
-          </TouchableOpacity>
-        )}
       </View>
 
       {sentenceStrip.length > 0 && (
@@ -392,38 +346,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
-    position: 'relative',
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
     color: '#1F2937',
-  },
-  hiddenButton: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    zIndex: 10,
-  },
-  hiddenButtonArea: {
-    width: 50,
-    height: 50,
-  },
-  modeButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: '#4A90E2',
-    borderRadius: 25,
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
   },
   sentenceStripContainer: {
     backgroundColor: '#fff',

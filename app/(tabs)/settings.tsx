@@ -10,13 +10,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
-import { Info, Trash2, Volume2, Palette, ChevronRight, Lock, Clock as Unlock } from 'lucide-react-native';
-import { useParentMode } from '@/contexts/ParentModeContext';
+import { Info, Trash2, Volume2, Palette, ChevronRight } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const { isParentMode, toggleMode } = useParentMode();
 
   async function clearStatistics() {
     Alert.alert(
@@ -53,27 +51,6 @@ export default function SettingsScreen() {
     );
   }
 
-  function handleToggleMode() {
-    Alert.alert(
-      'Xác nhận',
-      isParentMode ? 'Chuyển sang chế độ trẻ em?' : 'Chuyển sang chế độ phụ huynh?',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Chuyển',
-          onPress: () => {
-            toggleMode();
-            Alert.alert(
-              'Đã chuyển chế độ',
-              isParentMode ? 'Các tab Quản lý, Thống kê và Cài đặt sẽ bị ẩn' : 'Đã mở khóa toàn bộ tính năng',
-              [{ text: 'OK' }]
-            );
-          },
-        },
-      ]
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -81,31 +58,6 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Chế độ ứng dụng</Text>
-
-          <TouchableOpacity style={styles.settingItem} onPress={handleToggleMode}>
-            <View style={styles.settingInfo}>
-              {isParentMode ? (
-                <Unlock size={24} color="#10B981" />
-              ) : (
-                <Lock size={24} color="#6B7280" />
-              )}
-              <View style={styles.settingText}>
-                <Text style={styles.settingLabel}>
-                  {isParentMode ? 'Chế độ phụ huynh' : 'Chế độ trẻ em'}
-                </Text>
-                <Text style={styles.settingDescription}>
-                  {isParentMode
-                    ? 'Có thể truy cập tất cả tính năng'
-                    : 'Chỉ hiển thị màn hình giao tiếp'}
-                </Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tùy chọn giao diện</Text>
 

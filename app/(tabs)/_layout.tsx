@@ -1,10 +1,7 @@
 import { Tabs } from 'expo-router';
 import { MessageSquare, Grid2x2 as Grid, ChartBar as BarChart3, Settings } from 'lucide-react-native';
-import { useParentMode } from '@/contexts/ParentModeContext';
 
 export default function TabLayout() {
-  const { isParentMode } = useParentMode();
-
   return (
     <Tabs
       screenOptions={{
@@ -37,7 +34,6 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Grid size={size} color={color} />
           ),
-          href: isParentMode ? '/manage' : null,
         }}
       />
       <Tabs.Screen
@@ -47,7 +43,6 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <BarChart3 size={size} color={color} />
           ),
-          href: isParentMode ? '/statistics' : null,
         }}
       />
       <Tabs.Screen
@@ -57,7 +52,6 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Settings size={size} color={color} />
           ),
-          href: isParentMode ? '/settings' : null,
         }}
       />
     </Tabs>

@@ -233,7 +233,6 @@ export default function StatisticsScreen() {
 
   function handleDayPress(date: Date) {
     const dateString = date.toISOString().split('T')[0];
-    setSelectedDate(dateString);
     loadDayDetails(dateString);
     setShowDayModal(true);
   }

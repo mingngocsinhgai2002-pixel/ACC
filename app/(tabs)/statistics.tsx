@@ -231,9 +231,9 @@ export default function StatisticsScreen() {
     return stat ? stat.count : 0;
   }
 
-  function handleDayPress(date: Date) {
+  async function handleDayPress(date: Date) {
     const dateString = date.toISOString().split('T')[0];
-    loadDayDetails(dateString);
+    await loadDayDetails(dateString);
     setShowDayModal(true);
   }
 

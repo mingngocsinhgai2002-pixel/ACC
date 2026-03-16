@@ -9,8 +9,10 @@ import {
   Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { Info, Trash2, Volume2, Palette, ChevronRight } from 'lucide-react-native';
+import { Info, Trash2, Volume2, Palette, ChevronRight, LogOut } from 'lucide-react-native';
+import { signOut } from '@/lib/auth';
 
 export default function SettingsScreen() {
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -48,6 +50,28 @@ export default function SettingsScreen() {
     Alert.alert(
       'Về ứng dụng AAC',
       'Ứng dụng hỗ trợ trẻ tự kỷ/chậm nói giao tiếp qua hình ảnh\n\nPhiên bản: 1.0.0\n\nỨng dụng sử dụng phương pháp PECS (Picture Exchange Communication System) để giúp trẻ biểu đạt nhu cầu và cảm xúc thông qua hình ảnh.'
+    );
+  }
+
+  async function handleLogout() {
+    Alert.alert(
+      'Đăng xuất',
+      'Bạn có chắc muốn đăng xuất?',
+      [
+        { text: 'Hủy', style: 'cancel' },
+        {
+          text: 'Đăng xuất',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+              router.replace('/auth');
+            } catch (error) {
+              Alert.alert('Lỗi', 'Không thể đăng xuất');
+            }
+          },
+        },
+      ]
     );
   }
 
@@ -134,6 +158,19 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.section}>
+          <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
+            <View style={styles.settingInfo}>
+              <LogOut size={24} color="#EF4444" />
+              <View style={styles.settingText}>
+                <Text style={[styles.settingLabel, { color: '#EF4444' }]}>
+                  Đăng xuất
+                </Text>
+              </View>
+            </View>
+            <ChevronRight size={20} color="#EF4444" />
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.footer}>Phiên bản 1.0.0</Text>
       </ScrollView>
@@ -220,6 +257,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1F2937',
     lineHeight: 22,
+  },
+  logoutItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
   footer: {
     textAlign: 'center',

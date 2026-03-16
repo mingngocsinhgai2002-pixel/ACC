@@ -1,4 +1,5 @@
 import { Card, Category } from '@/types/database';
+import { supabase } from './supabase';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL
   ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1`
@@ -73,5 +74,78 @@ export const api = {
       total_sessions: 0,
       top_cards: [],
     };
+  },
+
+  async createCard(
+    title: string,
+    imageUrl: string,
+    categoryId: string,
+    audioUrl?: string
+  ): Promise<Card | null> {
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      if (!authData.user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('cards')
+        .insert({
+          title,
+          image_url: imageUrl,
+          category_id: categoryId,
+          audio_url: audioUrl || null,
+          user_id: authData.user.id,
+          is_custom: true,
+        })
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Create card error:', error);
+      return null;
+    }
+  },
+
+  async deleteCard(cardId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('cards')
+        .delete()
+        .eq('id', cardId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Delete card error:', error);
+      return false;
+    }
+  },
+
+  async updateCard(
+    cardId: string,
+    title: string,
+    imageUrl: string,
+    audioUrl?: string
+  ): Promise<Card | null> {
+    try {
+      const { data, error } = await supabase
+        .from('cards')
+        .update({
+          title,
+          image_url: imageUrl,
+          audio_url: audioUrl || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', cardId)
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Update card error:', error);
+      return null;
+    }
   },
 };

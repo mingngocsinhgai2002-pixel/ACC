@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
@@ -70,117 +71,6 @@ export default function CommunicationScreen() {
     }
   }
 
-  function getImageSource(imageUrl: string) {
-    const imageMap: Record<string, any> = {
-      'an.jpg': require('@/images/an.jpg'),
-      'anh.jpg': require('@/images/anh.jpg'),
-      'ao.jpg': require('@/images/ao.jpg'),
-      'ba.jpg': require('@/images/ba.jpg'),
-      'bac.jpg': require('@/images/bac.jpg'),
-      'bac_si.jpg': require('@/images/bac_si.jpg'),
-      'ban.jpg': require('@/images/ban.jpg'),
-      'ban_chai.jpg': require('@/images/ban_chai.jpg'),
-      'benh_vien.jpg': require('@/images/benh_vien.jpg'),
-      'bep.jpg': require('@/images/bep.jpg'),
-      'bien.jpg': require('@/images/bien.jpg'),
-      'binh_thuong.jpg': require('@/images/binh_thuong.jpg'),
-      'bo.jpg': require('@/images/bo.jpg'),
-      'boi.jpg': require('@/images/boi.jpg'),
-      'bong.jpg': require('@/images/bong.jpg'),
-      'buc_minh.jpg': require('@/images/buc_minh.jpg'),
-      'buon.jpg': require('@/images/buon.jpg'),
-      'but.jpg': require('@/images/but.jpg'),
-      'cap.jpg': require('@/images/cap.jpg'),
-      'cau.jpg': require('@/images/cau.jpg'),
-      'chai_toc.jpg': require('@/images/chai_toc.jpg'),
-      'chan.jpg': require('@/images/chan.jpg'),
-      'chay.jpg': require('@/images/chay.jpg'),
-      'chi.jpg': require('@/images/chi.jpg'),
-      'choi.jpg': require('@/images/choi.jpg'),
-      'chu.jpg': require('@/images/chu.jpg'),
-      'chup_anh.jpg': require('@/images/chup_anh.jpg'),
-      'co.jpg': require('@/images/co.jpg'),
-      'co_giao.jpg': require('@/images/co_giao.jpg'),
-      'coc.jpg': require('@/images/coc.jpg'),
-      'con.jpg': require('@/images/con.jpg'),
-      'cong_vien.jpg': require('@/images/cong_vien.jpg'),
-      'da_bong.jpg': require('@/images/da_bong.jpg'),
-      'danh_rang.jpg': require('@/images/danh_rang.jpg'),
-      'dau.jpg': require('@/images/dau.jpg'),
-      'di.jpg': require('@/images/di.jpg'),
-      'di_dao.jpg': require('@/images/di_dao.jpg'),
-      'di_xe_dap.jpg': require('@/images/di_xe_dap.jpg'),
-      'dien_thoai.jpg': require('@/images/dien_thoai.jpg'),
-      'do_choi.jpg': require('@/images/do_choi.jpg'),
-      'doc_sach.jpg': require('@/images/doc_sach.jpg'),
-      'doi.jpg': require('@/images/doi.jpg'),
-      'don_dep.jpg': require('@/images/don_dep.jpg'),
-      'em.jpg': require('@/images/em.jpg'),
-      'ghet.jpg': require('@/images/ghet.jpg'),
-      'gian.jpg': require('@/images/gian.jpg'),
-      'giay.jpg': require('@/images/giay.jpg'),
-      'giup_do.jpg': require('@/images/giup_do.jpg'),
-      'goi.jpg': require('@/images/goi.jpg'),
-      'hanh_phuc.jpg': require('@/images/hanh_phuc.jpg'),
-      'hat.jpg': require('@/images/hat.jpg'),
-      'hoc.jpg': require('@/images/hoc.jpg'),
-      'kem_danh_rang.jpg': require('@/images/kem_danh_rang.jpg'),
-      'khan.jpg': require('@/images/khan.jpg'),
-      'khat.jpg': require('@/images/khat.jpg'),
-      'lam_vuon.jpg': require('@/images/lam_vuon.jpg'),
-      'lanh.jpg': require('@/images/lanh.jpg'),
-      'lo_lang.jpg': require('@/images/lo_lang.jpg'),
-      'mac_quan_ao.jpg': require('@/images/mac_quan_ao.jpg'),
-      'may_tinh.jpg': require('@/images/may_tinh.jpg'),
-      'me.jpg': require('@/images/me.jpg'),
-      'met.jpg': require('@/images/met.jpg'),
-      'nau_an.jpg': require('@/images/nau_an.jpg'),
-      'nghe_nhac.jpg': require('@/images/nghe_nhac.jpg'),
-      'nghi_ngoi.jpg': require('@/images/nghi_ngoi.jpg'),
-      'ngu.jpg': require('@/images/ngu.jpg'),
-      'nha.jpg': require('@/images/nha.jpg'),
-      'nha_ban.jpg': require('@/images/nha_ban.jpg'),
-      'nha_hang.jpg': require('@/images/nha_hang.jpg'),
-      'nha_tam.jpg': require('@/images/nha_tam.jpg'),
-      'nhay.jpg': require('@/images/nhay.jpg'),
-      'nhay_day.jpg': require('@/images/nhay_day.jpg'),
-      'nho.jpg': require('@/images/nho.jpg'),
-      'noi_chuyen.jpg': require('@/images/noi_chuyen.jpg'),
-      'non.jpg': require('@/images/non.jpg'),
-      'nong.jpg': require('@/images/nong.jpg'),
-      'nui.jpg': require('@/images/nui.jpg'),
-      'ong.jpg': require('@/images/ong.jpg'),
-      'phong_ngu.jpg': require('@/images/phong_ngu.jpg'),
-      'quan.jpg': require('@/images/quan.jpg'),
-      'rap_phim.jpg': require('@/images/rap_phim.jpg'),
-      'rua_tay.jpg': require('@/images/rua_tay.jpg'),
-      'sach.jpg': require('@/images/sach.jpg'),
-      'san_choi.jpg': require('@/images/san_choi.jpg'),
-      'sieu_thi.jpg': require('@/images/sieu_thi.jpg'),
-      'so.jpg': require('@/images/so.jpg'),
-      'tam.jpg': require('@/images/tam.jpg'),
-      'thay_giao.jpg': require('@/images/thay_giao.jpg'),
-      'thich.jpg': require('@/images/thich.jpg'),
-      'thu_vien.jpg': require('@/images/thu_vien.jpg'),
-      'truong.jpg': require('@/images/truong.jpg'),
-      'tv.jpg': require('@/images/tv.jpg'),
-      'uong_nuoc.jpg': require('@/images/uong_nuoc.jpg'),
-      've.jpg': require('@/images/ve.jpg'),
-      've_sinh.jpg': require('@/images/ve_sinh.jpg'),
-      'vo.jpg': require('@/images/vo.jpg'),
-      'vui.jpg': require('@/images/vui.jpg'),
-      'xe_dap.jpg': require('@/images/xe_dap.jpg'),
-      'xem_tv.jpg': require('@/images/xem_tv.jpg'),
-      'yeu.jpg': require('@/images/yeu.jpg'),
-    };
-
-    if (imageMap[imageUrl]) {
-      return imageMap[imageUrl];
-    }
-
-    return null;
-  }
-
   async function handleCardPress(card: Card) {
     setSentenceStrip([...sentenceStrip, card]);
     await Speech.speak(card.title, { language: 'vi-VN' });
@@ -236,16 +126,10 @@ export default function CommunicationScreen() {
             contentContainerStyle={styles.sentenceStrip}>
             {sentenceStrip.map((card, index) => (
               <View key={`${card.id}-${index}`} style={styles.stripCard}>
-                {getImageSource(card.image_url) ? (
-                  <Image
-                    source={getImageSource(card.image_url)}
-                    style={styles.stripCardImage}
-                  />
-                ) : (
-                  <View style={[styles.stripCardImage, styles.placeholderImage]}>
-                    <Text style={styles.placeholderTextSmall}>?</Text>
-                  </View>
-                )}
+                <Image
+                  source={{ uri: card.image_url }}
+                  style={styles.stripCardImage}
+                />
                 <Text style={styles.stripCardText} numberOfLines={1}>
                   {card.title}
                 </Text>
@@ -303,17 +187,11 @@ export default function CommunicationScreen() {
               key={card.id}
               style={styles.card}
               onPress={() => handleCardPress(card)}>
-              {getImageSource(card.image_url) ? (
-                <Image
-                  source={getImageSource(card.image_url)}
-                  style={styles.cardImage}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View style={[styles.cardImage, styles.placeholderImage]}>
-                  <Text style={styles.placeholderText}>?</Text>
-                </View>
-              )}
+              <Image
+                source={{ uri: card.image_url }}
+                style={styles.cardImage}
+                resizeMode="cover"
+              />
               <View style={styles.cardTitleContainer}>
                 <Text style={styles.cardTitle} numberOfLines={2}>
                   {card.title}
@@ -492,20 +370,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1F2937',
     textAlign: 'center',
-  },
-  placeholderImage: {
-    backgroundColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholderText: {
-    fontSize: 48,
-    color: '#9CA3AF',
-    fontWeight: '300',
-  },
-  placeholderTextSmall: {
-    fontSize: 32,
-    color: '#9CA3AF',
-    fontWeight: '300',
   },
 });

@@ -9,10 +9,15 @@ import {
   Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { Info, Trash2, Volume2, Palette, ChevronRight, LogOut } from 'lucide-react-native';
-import { signOut } from '@/lib/auth';
+import {
+  Info,
+  Trash2,
+  HelpCircle,
+  Volume2,
+  Palette,
+  ChevronRight,
+} from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -53,25 +58,10 @@ export default function SettingsScreen() {
     );
   }
 
-  async function handleLogout() {
+  function showHelp() {
     Alert.alert(
-      'Đăng xuất',
-      'Bạn có chắc muốn đăng xuất?',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Đăng xuất',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await signOut();
-              router.replace('/auth');
-            } catch (error) {
-              Alert.alert('Lỗi', 'Không thể đăng xuất');
-            }
-          },
-        },
-      ]
+      'Hướng dẫn sử dụng',
+      '📱 Giao tiếp:\n- Chạm vào thẻ để phát âm thanh\n- Kéo thẻ vào thanh câu để tạo câu hoàn chỉnh\n- Nhấn nút "Nói" để phát toàn bộ câu\n\n📝 Quản lý thẻ:\n- Nhấn nút + để thêm thẻ mới\n- Chụp ảnh hoặc chọn từ thư viện\n- Ghi âm giọng nói tùy chỉnh (tùy chọn)\n\n📊 Thống kê:\n- Xem thẻ nào được sử dụng nhiều nhất\n- Theo dõi tiến trình học của bé\n\n⚙️ Cài đặt:\n- Tùy chỉnh âm thanh và giao diện\n- Quản lý dữ liệu'
     );
   }
 
@@ -144,6 +134,19 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Hỗ trợ</Text>
 
+          <TouchableOpacity style={styles.settingItem} onPress={showHelp}>
+            <View style={styles.settingInfo}>
+              <HelpCircle size={24} color="#4A90E2" />
+              <View style={styles.settingText}>
+                <Text style={styles.settingLabel}>Hướng dẫn sử dụng</Text>
+                <Text style={styles.settingDescription}>
+                  Cách sử dụng ứng dụng
+                </Text>
+              </View>
+            </View>
+            <ChevronRight size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.settingItem} onPress={showAbout}>
             <View style={styles.settingInfo}>
               <Info size={24} color="#4A90E2" />
@@ -158,18 +161,15 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.section}>
-          <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
-            <View style={styles.settingInfo}>
-              <LogOut size={24} color="#EF4444" />
-              <View style={styles.settingText}>
-                <Text style={[styles.settingLabel, { color: '#EF4444' }]}>
-                  Đăng xuất
-                </Text>
-              </View>
-            </View>
-            <ChevronRight size={20} color="#EF4444" />
-          </TouchableOpacity>
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Lưu ý dành cho phụ huynh</Text>
+          <Text style={styles.infoText}>
+            ✓ Sử dụng ứng dụng trong môi trường yên tĩnh{'\n'}
+            ✓ Khuyến khích bé tự chọn thẻ, không ép buộc{'\n'}
+            ✓ Khen ngợi mỗi khi bé sử dụng đúng thẻ{'\n'}
+            ✓ Bắt đầu với các thẻ quen thuộc, sau đó mở rộng dần{'\n'}
+            ✓ Kiên nhẫn và duy trì tập luyện hàng ngày
+          </Text>
         </View>
 
         <Text style={styles.footer}>Phiên bản 1.0.0</Text>
@@ -257,15 +257,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1F2937',
     lineHeight: 22,
-  },
-  logoutItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
   },
   footer: {
     textAlign: 'center',

@@ -6,11 +6,12 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { Card } from '@/types/database';
-import { TrendingUp, Calendar, Award } from 'lucide-react-native';
+import { TrendingUp, Calendar, Award, X, ChevronLeft, ChevronRight } from 'lucide-react-native';
 
 interface CardUsageStats {
   card: Card;
@@ -22,6 +23,12 @@ interface DailyStats {
   count: number;
 }
 
+interface DayDetail {
+  date: string;
+  cards: CardUsageStats[];
+  totalCount: number;
+}
+
 export default function StatisticsScreen() {
   const [topCards, setTopCards] = useState<CardUsageStats[]>([]);
   const [dailyStats, setDailyStats] = useState<DailyStats[]>([]);
@@ -30,6 +37,10 @@ export default function StatisticsScreen() {
     'week'
   );
   const [loading, setLoading] = useState(true);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [dayDetails, setDayDetails] = useState<DayDetail | null>(null);
+  const [showDayModal, setShowDayModal] = useState(false);
 
   useEffect(() => {
     loadStatistics();
@@ -140,6 +151,122 @@ export default function StatisticsScreen() {
     return `${date.getDate()}/${date.getMonth() + 1}`;
   }
 
+  async function loadDayDetails(dateString: string) {
+    try {
+      const startDate = new Date(dateString);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(dateString);
+      endDate.setHours(23, 59, 59, 999);
+
+      const { data: logs, error } = await supabase
+        .from('usage_logs')
+        .select('card_id')
+        .gte('used_at', startDate.toISOString())
+        .lte('used_at', endDate.toISOString());
+
+      if (error) throw error;
+
+      const cardCounts = logs.reduce(
+        (acc, log) => {
+          acc[log.card_id] = (acc[log.card_id] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
+
+      const cardIds = Object.keys(cardCounts);
+      if (cardIds.length === 0) {
+        setDayDetails({
+          date: dateString,
+          cards: [],
+          totalCount: 0,
+        });
+        return;
+      }
+
+      const { data: cards, error: cardsError } = await supabase
+        .from('cards')
+        .select('*')
+        .in('id', cardIds);
+
+      if (cardsError) throw cardsError;
+
+      const stats: CardUsageStats[] = cards
+        .map((card) => ({
+          card,
+          count: cardCounts[card.id] || 0,
+        }))
+        .sort((a, b) => b.count - a.count);
+
+      setDayDetails({
+        date: dateString,
+        cards: stats,
+        totalCount: logs.length,
+      });
+    } catch (error) {
+      console.error('Error loading day details:', error);
+    }
+  }
+
+  function getCalendarDays() {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days: (Date | null)[] = [];
+
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(new Date(year, month, i));
+    }
+
+    return days;
+  }
+
+  function getUsageCountForDate(date: Date): number {
+    const dateString = date.toISOString().split('T')[0];
+    const stat = dailyStats.find(s => s.date === dateString);
+    return stat ? stat.count : 0;
+  }
+
+  function handleDayPress(date: Date) {
+    const dateString = date.toISOString().split('T')[0];
+    setSelectedDate(dateString);
+    loadDayDetails(dateString);
+    setShowDayModal(true);
+  }
+
+  function goToPreviousMonth() {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  }
+
+  function goToNextMonth() {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  }
+
+  function formatMonthYear(date: Date) {
+    const months = [
+      'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
+      'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
+      'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+    ];
+    return `${months[date.getMonth()]} ${date.getFullYear()}`;
+  }
+
+  function formatDayDetail(dateString: string) {
+    const date = new Date(dateString);
+    const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+    return `${days[date.getDay()]}, ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  }
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -204,31 +331,68 @@ export default function StatisticsScreen() {
           </View>
         </View>
 
-        {dailyStats.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Calendar size={20} color="#4A90E2" />
-              <Text style={styles.sectionTitle}>Sử dụng theo ngày</Text>
-            </View>
-            <View style={styles.chartContainer}>
-              {dailyStats.map((stat, index) => {
-                const maxCount = Math.max(...dailyStats.map((s) => s.count));
-                const height = (stat.count / maxCount) * 120;
-                return (
-                  <View key={stat.date} style={styles.chartBar}>
-                    <View style={styles.barContainer}>
-                      <View
-                        style={[styles.bar, { height: Math.max(height, 20) }]}>
-                        <Text style={styles.barLabel}>{stat.count}</Text>
-                      </View>
-                    </View>
-                    <Text style={styles.barDate}>{formatDate(stat.date)}</Text>
-                  </View>
-                );
-              })}
-            </View>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Calendar size={20} color="#4A90E2" />
+            <Text style={styles.sectionTitle}>Lịch sử sử dụng</Text>
           </View>
-        )}
+
+          <View style={styles.calendarHeader}>
+            <TouchableOpacity onPress={goToPreviousMonth} style={styles.monthButton}>
+              <ChevronLeft size={24} color="#4A90E2" />
+            </TouchableOpacity>
+            <Text style={styles.monthYearText}>{formatMonthYear(currentMonth)}</Text>
+            <TouchableOpacity onPress={goToNextMonth} style={styles.monthButton}>
+              <ChevronRight size={24} color="#4A90E2" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.weekDaysHeader}>
+            {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day) => (
+              <View key={day} style={styles.weekDayCell}>
+                <Text style={styles.weekDayText}>{day}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.calendarGrid}>
+            {getCalendarDays().map((date, index) => {
+              if (!date) {
+                return <View key={`empty-${index}`} style={styles.calendarDay} />;
+              }
+
+              const usageCount = getUsageCountForDate(date);
+              const hasUsage = usageCount > 0;
+              const isToday = date.toDateString() === new Date().toDateString();
+
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.calendarDay,
+                    hasUsage && styles.calendarDayWithUsage,
+                    isToday && styles.calendarDayToday,
+                  ]}
+                  onPress={() => handleDayPress(date)}
+                  disabled={!hasUsage}>
+                  <Text
+                    style={[
+                      styles.calendarDayText,
+                      hasUsage && styles.calendarDayTextWithUsage,
+                      isToday && styles.calendarDayTextToday,
+                    ]}>
+                    {date.getDate()}
+                  </Text>
+                  {hasUsage && (
+                    <View style={styles.usageBadge}>
+                      <Text style={styles.usageBadgeText}>{usageCount}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -265,6 +429,69 @@ export default function StatisticsScreen() {
           )}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showDayModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowDayModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalTitleContainer}>
+                <Calendar size={24} color="#4A90E2" />
+                <Text style={styles.modalTitle}>
+                  {dayDetails && formatDayDetail(dayDetails.date)}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setShowDayModal(false)}
+                style={styles.closeButton}>
+                <X size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            {dayDetails && (
+              <ScrollView style={styles.modalBody}>
+                <View style={styles.modalSummary}>
+                  <Text style={styles.modalSummaryText}>
+                    Tổng số lần sử dụng: <Text style={styles.modalSummaryNumber}>{dayDetails.totalCount}</Text>
+                  </Text>
+                  <Text style={styles.modalSummaryText}>
+                    Số thẻ khác nhau: <Text style={styles.modalSummaryNumber}>{dayDetails.cards.length}</Text>
+                  </Text>
+                </View>
+
+                {dayDetails.cards.length === 0 ? (
+                  <View style={styles.emptyState}>
+                    <Text style={styles.emptyText}>Không có dữ liệu</Text>
+                  </View>
+                ) : (
+                  <View style={styles.dayCardsList}>
+                    {dayDetails.cards.map((stat, index) => (
+                      <View key={stat.card.id} style={styles.dayCardItem}>
+                        <View style={styles.dayCardRank}>
+                          <Text style={styles.dayCardRankText}>{index + 1}</Text>
+                        </View>
+                        <Image
+                          source={{ uri: stat.card.image_url }}
+                          style={styles.dayCardImage}
+                        />
+                        <View style={styles.dayCardInfo}>
+                          <Text style={styles.dayCardTitle}>{stat.card.title}</Text>
+                          <Text style={styles.dayCardCount}>
+                            {stat.count} lần
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -458,6 +685,183 @@ const styles = StyleSheet.create({
     color: '#1F2937',
   },
   topCardCount: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 15,
+    marginBottom: 15,
+  },
+  monthButton: {
+    padding: 8,
+  },
+  monthYearText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  weekDaysHeader: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  weekDayCell: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  weekDayText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  calendarDay: {
+    width: '14.28%',
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 4,
+    position: 'relative',
+  },
+  calendarDayWithUsage: {
+    backgroundColor: '#E0F2FE',
+    borderRadius: 8,
+  },
+  calendarDayToday: {
+    borderWidth: 2,
+    borderColor: '#4A90E2',
+    borderRadius: 8,
+  },
+  calendarDayText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+  },
+  calendarDayTextWithUsage: {
+    color: '#1F2937',
+    fontWeight: '600',
+  },
+  calendarDayTextToday: {
+    color: '#4A90E2',
+    fontWeight: '700',
+  },
+  usageBadge: {
+    position: 'absolute',
+    bottom: 2,
+    backgroundColor: '#4A90E2',
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  usageBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '85%',
+    paddingBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1F2937',
+    flex: 1,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalBody: {
+    flex: 1,
+  },
+  modalSummary: {
+    backgroundColor: '#F0F9FF',
+    margin: 20,
+    padding: 16,
+    borderRadius: 12,
+    gap: 8,
+  },
+  modalSummaryText: {
+    fontSize: 15,
+    color: '#374151',
+  },
+  modalSummaryNumber: {
+    fontWeight: '700',
+    color: '#4A90E2',
+    fontSize: 16,
+  },
+  dayCardsList: {
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  dayCardItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 12,
+  },
+  dayCardRank: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#4A90E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  dayCardRankText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  dayCardImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  dayCardInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  dayCardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  dayCardCount: {
     fontSize: 14,
     color: '#6B7280',
     marginTop: 2,
